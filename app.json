@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "mens-cycle-tracker",
+    "name": "Cycle Tracker",
     "slug": "mens-cycle-tracker",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -10,7 +10,7 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#FFF5F8"
     },
     "ios": {
       "supportsTablet": true

@@ -1,20 +1,42 @@
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text } from 'react-native';
+import HomeScreen from './src/screens/HomeScreen';
+import CalendarScreen from './src/screens/CalendarScreen';
+import InsightsScreen from './src/screens/InsightsScreen';
+import SettingsScreen from './src/screens/SettingsScreen';
+
+const Tab = createBottomTabNavigator();
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <StatusBar style="dark" />
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ color, size }) => {
+            const icons: Record<string, string> = {
+              Home: '🏠',
+              Calendar: '📅',
+              Insights: '📊',
+              Settings: '⚙️',
+            };
+            return <Text style={{ fontSize: size - 4 }}>{icons[route.name]}</Text>;
+          },
+          tabBarActiveTintColor: '#E91E63',
+          tabBarInactiveTintColor: '#aaa',
+          headerStyle: { backgroundColor: '#FFF5F8' },
+          headerTintColor: '#C2185B',
+          headerTitleStyle: { fontWeight: '700' },
+        })}
+      >
+        <Tab.Screen name="Home" component={HomeScreen} options={{ title: 'Cycle Tracker' }} />
+        <Tab.Screen name="Calendar" component={CalendarScreen} options={{ title: 'History' }} />
+        <Tab.Screen name="Insights" component={InsightsScreen} options={{ title: 'Insights' }} />
+        <Tab.Screen name="Settings" component={SettingsScreen} />
+      </Tab.Navigator>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
