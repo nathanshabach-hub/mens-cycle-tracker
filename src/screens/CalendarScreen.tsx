@@ -25,7 +25,7 @@ export default function CalendarScreen() {
         marked: true,
         dotColor: '#9C27B0',
         selected: true,
-        selectedColor: '#CE93D8',
+        selectedColor: '#FFD54F',
       };
 
       let cursor = parseISO(forecast.fertileWindowStart);
@@ -79,21 +79,21 @@ export default function CalendarScreen() {
         onDayPress={handleDayPress}
         markedDates={markedDates}
         theme={{
-          todayTextColor: '#F48FB1',
-          selectedDayBackgroundColor: '#F48FB1',
-          arrowColor: '#F48FB1',
-          dotColor: '#F48FB1',
+          todayTextColor: '#FFB300',
+          selectedDayBackgroundColor: '#FFB300',
+          arrowColor: '#FFB300',
+          dotColor: '#FFB300',
         }}
         style={styles.calendar}
       />
 
       <View style={styles.legend}>
         <View style={styles.legendItem}>
-          <View style={[styles.dot, { backgroundColor: '#F48FB1' }]} />
+          <View style={[styles.dot, { backgroundColor: '#FFB300' }]} />
           <Text style={styles.legendText}>Cycle Start</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.dot, { backgroundColor: '#CE93D8' }]} />
+          <View style={[styles.dot, { backgroundColor: '#FFD54F' }]} />
           <Text style={styles.legendText}>Predicted Next</Text>
         </View>
         <View style={styles.legendItem}>
@@ -126,9 +126,9 @@ export default function CalendarScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F5F5F5' },
+  container: { flex: 1, backgroundColor: '#FAFAFA' },
   content: { padding: 16, paddingBottom: 40 },
-  title: { fontSize: 24, fontWeight: '700', color: '#1A237E', marginBottom: 12, textAlign: 'center' },
+  title: { fontSize: 24, fontWeight: '700', color: '#37474F', marginBottom: 12, textAlign: 'center' },
   calendar: { borderRadius: 12, elevation: 2 },
   legend: { flexDirection: 'row', gap: 16, marginTop: 10, marginBottom: 4, paddingHorizontal: 4 },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
