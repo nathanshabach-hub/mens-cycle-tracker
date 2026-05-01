@@ -25,7 +25,7 @@ export default function CalendarScreen() {
         marked: true,
         dotColor: '#9C27B0',
         selected: true,
-        selectedColor: '#FF8A65',
+        selectedColor: '#F6F3F5',
       };
 
       let cursor = parseISO(forecast.fertileWindowStart);
@@ -93,7 +93,7 @@ export default function CalendarScreen() {
           <Text style={styles.legendText}>Cycle Start</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.dot, { backgroundColor: '#FF8A65' }]} />
+          <View style={[styles.dot, { backgroundColor: '#F6F3F5' }]} />
           <Text style={styles.legendText}>Predicted Next</Text>
         </View>
         <View style={styles.legendItem}>
