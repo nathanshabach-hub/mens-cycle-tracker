@@ -79,17 +79,17 @@ export default function CalendarScreen() {
         onDayPress={handleDayPress}
         markedDates={markedDates}
         theme={{
-          todayTextColor: '#FF6E40',
-          selectedDayBackgroundColor: '#FF6E40',
-          arrowColor: '#FF6E40',
-          dotColor: '#FF6E40',
+          todayTextColor: '#00695C',
+          selectedDayBackgroundColor: '#00695C',
+          arrowColor: '#00695C',
+          dotColor: '#00695C',
         }}
         style={styles.calendar}
       />
 
       <View style={styles.legend}>
         <View style={styles.legendItem}>
-          <View style={[styles.dot, { backgroundColor: '#FF6E40' }]} />
+          <View style={[styles.dot, { backgroundColor: '#00695C' }]} />
           <Text style={styles.legendText}>Cycle Start</Text>
         </View>
         <View style={styles.legendItem}>

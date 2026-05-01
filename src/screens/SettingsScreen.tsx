@@ -187,7 +187,7 @@ export default function SettingsScreen() {
           <Switch
             value={tryingToConceive}
             onValueChange={setTryingToConceive}
-            trackColor={{ true: '#FF6E40' }}
+            trackColor={{ true: '#00695C' }}
           />
         </View>
 
@@ -241,7 +241,7 @@ export default function SettingsScreen() {
           <Switch
             value={remind3Days}
             onValueChange={handleToggle3Days}
-            trackColor={{ true: '#FF6E40' }}
+            trackColor={{ true: '#00695C' }}
             disabled={!nextCycle}
           />
         </View>
@@ -251,7 +251,7 @@ export default function SettingsScreen() {
           <Switch
             value={remind1Day}
             onValueChange={handleToggle1Day}
-            trackColor={{ true: '#FF6E40' }}
+            trackColor={{ true: '#00695C' }}
             disabled={!nextCycle}
           />
         </View>

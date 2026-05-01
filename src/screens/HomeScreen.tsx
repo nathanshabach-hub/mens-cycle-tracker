@@ -111,7 +111,7 @@ export default function HomeScreen() {
 
       <View style={styles.card}>
         <Text style={styles.cardLabel}>Next Predicted Cycle</Text>
-        <Text style={[styles.cardValue, { color: '#FF6E40' }]}>{nextCycle ?? '—'}</Text>
+        <Text style={[styles.cardValue, { color: '#00695C' }]}>{nextCycle ?? '—'}</Text>
       </View>
 
       <View style={[styles.card, styles.importantCard]}>
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   trendBar: { width: 22, borderRadius: 8, backgroundColor: '#4DB6AC' },
   trendText: { marginTop: 4, fontSize: 11, color: '#666' },
   logButton: {
-    backgroundColor: '#FF6E40', borderRadius: 10, padding: 14,
+    backgroundColor: '#00695C', borderRadius: 10, padding: 14,
     alignItems: 'center', marginBottom: 16,
   },
   logButtonText: { color: '#fff', fontWeight: '700', fontSize: 16 },
@@ -299,12 +299,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fafafa',
   },
   noResults: { color: '#aaa', fontSize: 13, padding: 8, fontStyle: 'italic' },
-  selectedCount: { marginTop: 6, fontSize: 12, color: '#FF6E40', fontStyle: 'italic' },
+  selectedCount: { marginTop: 6, fontSize: 12, color: '#00695C', fontStyle: 'italic' },
   chip: {
     borderWidth: 1, borderColor: '#ddd', borderRadius: 20,
     paddingHorizontal: 12, paddingVertical: 6,
   },
-  chipSelected: { backgroundColor: '#FF6E40', borderColor: '#FF6E40' },
+  chipSelected: { backgroundColor: '#00695C', borderColor: '#00695C' },
   chipText: { color: '#555', fontSize: 13 },
   chipTextSelected: { color: '#fff', fontWeight: '600' },
   saveButton: {

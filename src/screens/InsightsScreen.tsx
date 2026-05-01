@@ -207,9 +207,9 @@ const styles = StyleSheet.create({
     marginRight: 8,
     backgroundColor: '#fff',
   },
-  monthButtonActive: { borderColor: '#FF6E40', backgroundColor: '#F4F9F8' },
+  monthButtonActive: { borderColor: '#00695C', backgroundColor: '#F4F9F8' },
   monthButtonText: { fontSize: 12, color: '#666' },
-  monthButtonTextActive: { color: '#FF6E40', fontWeight: '700' },
+  monthButtonTextActive: { color: '#00695C', fontWeight: '700' },
   monthDetails: { marginTop: 12, borderTopWidth: 1, borderTopColor: '#f0f0f0', paddingTop: 12 },
   statRow: {
     flexDirection: 'row',
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
   phaseDate: { fontSize: 12, color: '#888', marginTop: 2 },
   phaseDesc: { fontSize: 12, color: '#666', fontStyle: 'italic' },
   exportButton: {
-    backgroundColor: '#FF6E40',
+    backgroundColor: '#00695C',
     borderRadius: 10,
     paddingVertical: 12,
     alignItems: 'center',
