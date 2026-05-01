@@ -181,9 +181,9 @@ export default function InsightsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FAFAFA' },
+  container: { flex: 1, backgroundColor: '#F6F3F5' },
   content: { padding: 16, paddingBottom: 40 },
-  title: { fontSize: 28, fontWeight: '700', color: '#37474F', marginBottom: 20, textAlign: 'center' },
+  title: { fontSize: 28, fontWeight: '700', color: '#2E7D32', marginBottom: 20, textAlign: 'center' },
   card: {
     backgroundColor: '#fff',
     borderRadius: 12,
@@ -207,9 +207,9 @@ const styles = StyleSheet.create({
     marginRight: 8,
     backgroundColor: '#fff',
   },
-  monthButtonActive: { borderColor: '#FFB300', backgroundColor: '#FAFAFA' },
+  monthButtonActive: { borderColor: '#AD7A99', backgroundColor: '#F6F3F5' },
   monthButtonText: { fontSize: 12, color: '#666' },
-  monthButtonTextActive: { color: '#FFB300', fontWeight: '700' },
+  monthButtonTextActive: { color: '#AD7A99', fontWeight: '700' },
   monthDetails: { marginTop: 12, borderTopWidth: 1, borderTopColor: '#f0f0f0', paddingTop: 12 },
   statRow: {
     flexDirection: 'row',
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 10,
     borderLeftWidth: 4,
-    borderLeftColor: '#455A64',
+    borderLeftColor: '#388E3C',
   },
   phaseHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
   phaseEmoji: { fontSize: 24, marginRight: 12 },
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
   phaseDate: { fontSize: 12, color: '#888', marginTop: 2 },
   phaseDesc: { fontSize: 12, color: '#666', fontStyle: 'italic' },
   exportButton: {
-    backgroundColor: '#FFB300',
+    backgroundColor: '#AD7A99',
     borderRadius: 10,
     paddingVertical: 12,
     alignItems: 'center',

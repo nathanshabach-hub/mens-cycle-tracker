@@ -187,7 +187,7 @@ export default function SettingsScreen() {
           <Switch
             value={tryingToConceive}
             onValueChange={setTryingToConceive}
-            trackColor={{ true: '#FFB300' }}
+            trackColor={{ true: '#AD7A99' }}
           />
         </View>
 
@@ -241,7 +241,7 @@ export default function SettingsScreen() {
           <Switch
             value={remind3Days}
             onValueChange={handleToggle3Days}
-            trackColor={{ true: '#FFB300' }}
+            trackColor={{ true: '#AD7A99' }}
             disabled={!nextCycle}
           />
         </View>
@@ -251,7 +251,7 @@ export default function SettingsScreen() {
           <Switch
             value={remind1Day}
             onValueChange={handleToggle1Day}
-            trackColor={{ true: '#FFB300' }}
+            trackColor={{ true: '#AD7A99' }}
             disabled={!nextCycle}
           />
         </View>
@@ -283,9 +283,9 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FAFAFA' },
+  container: { flex: 1, backgroundColor: '#F6F3F5' },
   content: { padding: 20, paddingBottom: 40 },
-  title: { fontSize: 24, fontWeight: '700', color: '#37474F', marginBottom: 20, textAlign: 'center' },
+  title: { fontSize: 24, fontWeight: '700', color: '#2E7D32', marginBottom: 20, textAlign: 'center' },
   card: {
     backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 16,
     shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 6, elevation: 2,
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
   rowLabel: { fontSize: 15, color: '#444', flex: 1 },
   saveButton: {
     marginTop: 12,
-    backgroundColor: '#37474F',
+    backgroundColor: '#2E7D32',
     borderRadius: 10,
     paddingVertical: 12,
     alignItems: 'center',
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
   addRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
   prefInput: { flex: 1, marginBottom: 0 },
   addButton: {
-    backgroundColor: '#37474F',
+    backgroundColor: '#2E7D32',
     borderRadius: 8,
     paddingHorizontal: 14,
     paddingVertical: 10,
