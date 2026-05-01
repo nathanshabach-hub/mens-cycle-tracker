@@ -21,10 +21,35 @@ export interface PartnerProfile {
   partnerPreferences: string[];
 }
 
-export type MoodOption = 'Happy' | 'Neutral' | 'Irritable' | 'Sad' | 'Anxious' | 'Energetic';
+export type MoodOption =
+  // Positive / high-energy (follicular & ovulation phases)
+  | 'Happy'
+  | 'Energetic'
+  | 'Confident'
+  | 'Motivated'
+  | 'Calm'
+  // Neutral
+  | 'Neutral'
+  // Negative / low-energy (luteal & menstrual phases — PMS/PMDD criteria)
+  | 'Irritable'
+  | 'Angry'
+  | 'Tense'
+  | 'Anxious'
+  | 'Overwhelmed'
+  | 'Sensitive'
+  | 'Sad'
+  | 'Tearful'
+  | 'Depressed'
+  | 'Withdrawn';
 
 export const MOOD_OPTIONS: MoodOption[] = [
-  'Happy', 'Neutral', 'Irritable', 'Sad', 'Anxious', 'Energetic',
+  // Positive
+  'Happy', 'Energetic', 'Confident', 'Motivated', 'Calm',
+  // Neutral
+  'Neutral',
+  // Negative
+  'Irritable', 'Angry', 'Tense', 'Anxious', 'Overwhelmed',
+  'Sensitive', 'Sad', 'Tearful', 'Depressed', 'Withdrawn',
 ];
 
 export const SYMPTOM_OPTIONS = [
