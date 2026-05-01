@@ -29,9 +29,16 @@ export default function HomeScreen() {
   const [showForm, setShowForm] = useState(false);
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [selectedMood, setSelectedMood] = useState<MoodOption>('Neutral');
+  const [moodSearch, setMoodSearch] = useState('');
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [symptomSearch, setSymptomSearch] = useState('');
   const [notes, setNotes] = useState('');
+
+  const filteredMoods = useMemo(() => {
+    const q = moodSearch.trim().toLowerCase();
+    if (!q) return MOOD_OPTIONS;
+    return MOOD_OPTIONS.filter((m) => m.toLowerCase().includes(q));
+  }, [moodSearch]);
 
   const filteredSymptoms = useMemo(() => {
     const q = symptomSearch.trim().toLowerCase();
@@ -83,6 +90,7 @@ export default function HomeScreen() {
     setShowForm(false);
     setSelectedSymptoms([]);
     setSymptomSearch('');
+    setMoodSearch('');
     setNotes('');
     setSelectedMood('Neutral');
     setSelectedDate(format(new Date(), 'yyyy-MM-dd'));
@@ -171,19 +179,31 @@ export default function HomeScreen() {
           />
 
           <Text style={styles.label}>Mood</Text>
-          <View style={styles.chipRow}>
-            {MOOD_OPTIONS.map((mood) => (
-              <TouchableOpacity
-                key={mood}
-                style={[styles.chip, selectedMood === mood && styles.chipSelected]}
-                onPress={() => setSelectedMood(mood)}
-              >
-                <Text style={[styles.chipText, selectedMood === mood && styles.chipTextSelected]}>
-                  {mood}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          <TextInput
+            style={styles.symptomSearch}
+            value={moodSearch}
+            onChangeText={setMoodSearch}
+            placeholder="Search moods..."
+            clearButtonMode="while-editing"
+          />
+          <ScrollView style={styles.symptomScroll} contentContainerStyle={styles.chipRow} nestedScrollEnabled>
+            {filteredMoods.length === 0 ? (
+              <Text style={styles.noResults}>No matching moods</Text>
+            ) : (
+              filteredMoods.map((mood) => (
+                <TouchableOpacity
+                  key={mood}
+                  style={[styles.chip, selectedMood === mood && styles.chipSelected]}
+                  onPress={() => setSelectedMood(mood)}
+                >
+                  <Text style={[styles.chipText, selectedMood === mood && styles.chipTextSelected]}>
+                    {mood}
+                  </Text>
+                </TouchableOpacity>
+              ))
+            )}
+          </ScrollView>
+          <Text style={styles.selectedCount}>Selected: {selectedMood}</Text>
 
           <Text style={styles.label}>Symptoms</Text>
           <TextInput
