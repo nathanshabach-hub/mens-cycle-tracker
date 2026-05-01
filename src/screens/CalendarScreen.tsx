@@ -23,7 +23,7 @@ export default function CalendarScreen() {
     if (forecast) {
       marks[forecast.nextCycleStart] = {
         marked: true,
-        dotColor: '#9C27B0',
+        dotColor: '#00695C',
         selected: true,
         selectedColor: '#F6F3F5',
       };
@@ -34,9 +34,9 @@ export default function CalendarScreen() {
         const key = format(cursor, 'yyyy-MM-dd');
         marks[key] = {
           marked: true,
-          dotColor: '#FB8C00',
+          dotColor: '#00695C',
           selected: true,
-          selectedColor: '#FFE0B2',
+          selectedColor: '#F6F3F5',
         };
         cursor = addDays(cursor, 1);
       }
@@ -97,7 +97,7 @@ export default function CalendarScreen() {
           <Text style={styles.legendText}>Predicted Next</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.dot, { backgroundColor: '#FFE0B2' }]} />
+          <View style={[styles.dot, { backgroundColor: '#F6F3F5' }]} />
           <Text style={styles.legendText}>Fertile Window</Text>
         </View>
         <View style={styles.legendItem}>
