@@ -111,7 +111,7 @@ export default function HomeScreen() {
 
       <View style={styles.card}>
         <Text style={styles.cardLabel}>Next Predicted Cycle</Text>
-        <Text style={[styles.cardValue, { color: '#AD7A99' }]}>{nextCycle ?? '—'}</Text>
+        <Text style={[styles.cardValue, { color: '#FF6E40' }]}>{nextCycle ?? '—'}</Text>
       </View>
 
       <View style={[styles.card, styles.importantCard]}>
@@ -123,7 +123,7 @@ export default function HomeScreen() {
 
       <View style={styles.card}>
         <Text style={styles.cardLabel}>Cycle Regularity Score</Text>
-        <Text style={[styles.cardValue, { color: '#388E3C' }]}>{regularityScore ?? 70}/100</Text>
+        <Text style={[styles.cardValue, { color: '#3949AB' }]}>{regularityScore ?? 70}/100</Text>
         <Text style={styles.helperText}>Based on recent cycle-to-cycle variation.</Text>
       </View>
 
@@ -254,9 +254,9 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F6F3F5' },
+  container: { flex: 1, backgroundColor: '#F4F9F8' },
   content: { padding: 20, paddingBottom: 40 },
-  title: { fontSize: 28, fontWeight: '700', color: '#2E7D32', marginBottom: 20, textAlign: 'center' },
+  title: { fontSize: 28, fontWeight: '700', color: '#00695C', marginBottom: 20, textAlign: 'center' },
   subtitle: { marginTop: -14, marginBottom: 16, textAlign: 'center', color: '#7b6c74', fontSize: 14 },
   card: {
     backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 14,
@@ -266,18 +266,18 @@ const styles = StyleSheet.create({
   cardValue: { fontSize: 22, fontWeight: '600', color: '#333' },
   importantCard: { borderLeftWidth: 4, borderLeftColor: '#00897B' },
   tipCard: { borderLeftWidth: 4, borderLeftColor: '#FF9800' },
-  prefCard: { borderLeftWidth: 4, borderLeftColor: '#CE9AB8' },
+  prefCard: { borderLeftWidth: 4, borderLeftColor: '#FF8A65' },
   prefRow: { flexDirection: 'row', alignItems: 'center', marginTop: 8 },
-  prefBullet: { fontSize: 18, color: '#CE9AB8', marginRight: 8, lineHeight: 22 },
+  prefBullet: { fontSize: 18, color: '#FF8A65', marginRight: 8, lineHeight: 22 },
   prefItem: { fontSize: 15, color: '#333' },
   helperText: { marginTop: 6, fontSize: 13, color: '#5f6b6b' },
   tipText: { marginTop: 8, fontSize: 15, color: '#53434b', lineHeight: 22 },
   trendWrap: { flexDirection: 'row', alignItems: 'flex-end', gap: 8, marginTop: 10 },
   trendItem: { alignItems: 'center', width: 34 },
-  trendBar: { width: 22, borderRadius: 8, backgroundColor: '#A5D6A7' },
+  trendBar: { width: 22, borderRadius: 8, backgroundColor: '#4DB6AC' },
   trendText: { marginTop: 4, fontSize: 11, color: '#666' },
   logButton: {
-    backgroundColor: '#AD7A99', borderRadius: 10, padding: 14,
+    backgroundColor: '#FF6E40', borderRadius: 10, padding: 14,
     alignItems: 'center', marginBottom: 16,
   },
   logButtonText: { color: '#fff', fontWeight: '700', fontSize: 16 },
@@ -299,16 +299,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#fafafa',
   },
   noResults: { color: '#aaa', fontSize: 13, padding: 8, fontStyle: 'italic' },
-  selectedCount: { marginTop: 6, fontSize: 12, color: '#AD7A99', fontStyle: 'italic' },
+  selectedCount: { marginTop: 6, fontSize: 12, color: '#FF6E40', fontStyle: 'italic' },
   chip: {
     borderWidth: 1, borderColor: '#ddd', borderRadius: 20,
     paddingHorizontal: 12, paddingVertical: 6,
   },
-  chipSelected: { backgroundColor: '#AD7A99', borderColor: '#AD7A99' },
+  chipSelected: { backgroundColor: '#FF6E40', borderColor: '#FF6E40' },
   chipText: { color: '#555', fontSize: 13 },
   chipTextSelected: { color: '#fff', fontWeight: '600' },
   saveButton: {
-    backgroundColor: '#2E7D32', borderRadius: 10, padding: 14,
+    backgroundColor: '#00695C', borderRadius: 10, padding: 14,
     alignItems: 'center', marginTop: 16,
   },
   saveButtonText: { color: '#fff', fontWeight: '700', fontSize: 16 },

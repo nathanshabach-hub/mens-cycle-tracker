@@ -25,7 +25,7 @@ export default function CalendarScreen() {
         marked: true,
         dotColor: '#9C27B0',
         selected: true,
-        selectedColor: '#CE9AB8',
+        selectedColor: '#FF8A65',
       };
 
       let cursor = parseISO(forecast.fertileWindowStart);
@@ -45,7 +45,7 @@ export default function CalendarScreen() {
         marked: true,
         dotColor: '#00897B',
         selected: true,
-        selectedColor: '#A5D6A7',
+        selectedColor: '#4DB6AC',
       };
     }
     setMarkedDates(marks);
@@ -79,21 +79,21 @@ export default function CalendarScreen() {
         onDayPress={handleDayPress}
         markedDates={markedDates}
         theme={{
-          todayTextColor: '#AD7A99',
-          selectedDayBackgroundColor: '#AD7A99',
-          arrowColor: '#AD7A99',
-          dotColor: '#AD7A99',
+          todayTextColor: '#FF6E40',
+          selectedDayBackgroundColor: '#FF6E40',
+          arrowColor: '#FF6E40',
+          dotColor: '#FF6E40',
         }}
         style={styles.calendar}
       />
 
       <View style={styles.legend}>
         <View style={styles.legendItem}>
-          <View style={[styles.dot, { backgroundColor: '#AD7A99' }]} />
+          <View style={[styles.dot, { backgroundColor: '#FF6E40' }]} />
           <Text style={styles.legendText}>Cycle Start</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.dot, { backgroundColor: '#CE9AB8' }]} />
+          <View style={[styles.dot, { backgroundColor: '#FF8A65' }]} />
           <Text style={styles.legendText}>Predicted Next</Text>
         </View>
         <View style={styles.legendItem}>
@@ -101,7 +101,7 @@ export default function CalendarScreen() {
           <Text style={styles.legendText}>Fertile Window</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.dot, { backgroundColor: '#A5D6A7' }]} />
+          <View style={[styles.dot, { backgroundColor: '#4DB6AC' }]} />
           <Text style={styles.legendText}>Ovulation Day</Text>
         </View>
       </View>
@@ -126,9 +126,9 @@ export default function CalendarScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F6F3F5' },
+  container: { flex: 1, backgroundColor: '#F4F9F8' },
   content: { padding: 16, paddingBottom: 40 },
-  title: { fontSize: 24, fontWeight: '700', color: '#2E7D32', marginBottom: 12, textAlign: 'center' },
+  title: { fontSize: 24, fontWeight: '700', color: '#00695C', marginBottom: 12, textAlign: 'center' },
   calendar: { borderRadius: 12, elevation: 2 },
   legend: { flexDirection: 'row', gap: 16, marginTop: 10, marginBottom: 4, paddingHorizontal: 4 },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
