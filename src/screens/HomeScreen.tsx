@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView,
   TextInput, Alert,
@@ -30,7 +30,14 @@ export default function HomeScreen() {
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [selectedMood, setSelectedMood] = useState<MoodOption>('Neutral');
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
+  const [symptomSearch, setSymptomSearch] = useState('');
   const [notes, setNotes] = useState('');
+
+  const filteredSymptoms = useMemo(() => {
+    const q = symptomSearch.trim().toLowerCase();
+    if (!q) return SYMPTOM_OPTIONS;
+    return SYMPTOM_OPTIONS.filter((s) => s.toLowerCase().includes(q));
+  }, [symptomSearch]);
 
   const load = useCallback(async () => {
     const data = await getCycleEntries();
@@ -75,6 +82,7 @@ export default function HomeScreen() {
     await saveCycleEntry(entry);
     setShowForm(false);
     setSelectedSymptoms([]);
+    setSymptomSearch('');
     setNotes('');
     setSelectedMood('Neutral');
     setSelectedDate(format(new Date(), 'yyyy-MM-dd'));
@@ -178,19 +186,33 @@ export default function HomeScreen() {
           </View>
 
           <Text style={styles.label}>Symptoms</Text>
-          <View style={styles.chipRow}>
-            {SYMPTOM_OPTIONS.map((symptom) => (
-              <TouchableOpacity
-                key={symptom}
-                style={[styles.chip, selectedSymptoms.includes(symptom) && styles.chipSelected]}
-                onPress={() => toggleSymptom(symptom)}
-              >
-                <Text style={[styles.chipText, selectedSymptoms.includes(symptom) && styles.chipTextSelected]}>
-                  {symptom}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          <TextInput
+            style={styles.symptomSearch}
+            value={symptomSearch}
+            onChangeText={setSymptomSearch}
+            placeholder="Search symptoms..."
+            clearButtonMode="while-editing"
+          />
+          <ScrollView style={styles.symptomScroll} contentContainerStyle={styles.chipRow} nestedScrollEnabled>
+            {filteredSymptoms.length === 0 ? (
+              <Text style={styles.noResults}>No matching symptoms</Text>
+            ) : (
+              filteredSymptoms.map((symptom) => (
+                <TouchableOpacity
+                  key={symptom}
+                  style={[styles.chip, selectedSymptoms.includes(symptom) && styles.chipSelected]}
+                  onPress={() => toggleSymptom(symptom)}
+                >
+                  <Text style={[styles.chipText, selectedSymptoms.includes(symptom) && styles.chipTextSelected]}>
+                    {symptom}
+                  </Text>
+                </TouchableOpacity>
+              ))
+            )}
+          </ScrollView>
+          {selectedSymptoms.length > 0 && (
+            <Text style={styles.selectedCount}>{selectedSymptoms.length} selected: {selectedSymptoms.join(', ')}</Text>
+          )}
 
           <Text style={styles.label}>Notes</Text>
           <TextInput
@@ -246,7 +268,18 @@ const styles = StyleSheet.create({
     padding: 10, fontSize: 15, color: '#333',
   },
   notesInput: { height: 80, textAlignVertical: 'top' },
-  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, padding: 8 },
+  symptomSearch: {
+    borderWidth: 1, borderColor: '#ddd', borderRadius: 8,
+    padding: 9, fontSize: 14, color: '#333', marginBottom: 6, backgroundColor: '#fafafa',
+  },
+  symptomScroll: {
+    maxHeight: 160,
+    borderWidth: 1, borderColor: '#eee', borderRadius: 8,
+    backgroundColor: '#fafafa',
+  },
+  noResults: { color: '#aaa', fontSize: 13, padding: 8, fontStyle: 'italic' },
+  selectedCount: { marginTop: 6, fontSize: 12, color: '#E91E63', fontStyle: 'italic' },
   chip: {
     borderWidth: 1, borderColor: '#ddd', borderRadius: 20,
     paddingHorizontal: 12, paddingVertical: 6,
