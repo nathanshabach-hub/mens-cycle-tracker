@@ -25,10 +25,10 @@ export default function App() {
             };
             return <Text style={{ fontSize: size - 4 }}>{icons[route.name]}</Text>;
           },
-          tabBarActiveTintColor: '#E91E63',
+          tabBarActiveTintColor: '#00695C',
           tabBarInactiveTintColor: '#aaa',
-          headerStyle: { backgroundColor: '#FFF5F8' },
-          headerTintColor: '#C2185B',
+          headerStyle: { backgroundColor: '#F4F9F8' },
+          headerTintColor: '#00695C',
           headerTitleStyle: { fontWeight: '700' },
         })}
       >
