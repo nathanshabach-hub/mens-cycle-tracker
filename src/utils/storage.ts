@@ -15,6 +15,7 @@ export const DEFAULT_PARTNER_PROFILE: PartnerProfile = {
   partnerName: '',
   tryingToConceive: false,
   averagePeriodLength: 5,
+  partnerPreferences: [],
 };
 
 export async function getCycleEntries(): Promise<CycleEntry[]> {

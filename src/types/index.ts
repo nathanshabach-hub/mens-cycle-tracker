@@ -18,6 +18,7 @@ export interface PartnerProfile {
   partnerName: string;
   tryingToConceive: boolean;
   averagePeriodLength: number;
+  partnerPreferences: string[];
 }
 
 export type MoodOption = 'Happy' | 'Neutral' | 'Irritable' | 'Sad' | 'Anxious' | 'Energetic';

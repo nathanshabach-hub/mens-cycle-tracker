@@ -25,6 +25,7 @@ export default function HomeScreen() {
   const [dailyTip, setDailyTip] = useState('');
   const [partnerName, setPartnerName] = useState('');
   const [trendLengths, setTrendLengths] = useState<number[]>([]);
+  const [partnerPreferences, setPartnerPreferences] = useState<string[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [selectedMood, setSelectedMood] = useState<MoodOption>('Neutral');
@@ -48,6 +49,7 @@ export default function HomeScreen() {
     setTrendLengths(getRecentCycleLengths(data));
     setDailyTip(getDailySupportTip(today, forecast, profile));
     setPartnerName(profile.partnerName);
+    setPartnerPreferences(profile.partnerPreferences ?? []);
   }, []);
 
   useEffect(() => { load(); }, [load]);
@@ -130,6 +132,21 @@ export default function HomeScreen() {
         <Text style={styles.tipText}>{dailyTip}</Text>
       </View>
 
+      {partnerPreferences.length > 0 && (
+        <View style={[styles.card, styles.prefCard]}>
+          <Text style={styles.cardLabel}>
+            {partnerName ? `${partnerName}'s Comfort Checklist` : 'Partner Comfort Checklist'}
+          </Text>
+          <Text style={styles.helperText}>Check if she needs any of these:</Text>
+          {partnerPreferences.map((item) => (
+            <View key={item} style={styles.prefRow}>
+              <Text style={styles.prefBullet}>•</Text>
+              <Text style={styles.prefItem}>{item}</Text>
+            </View>
+          ))}
+        </View>
+      )}
+
       <TouchableOpacity style={styles.logButton} onPress={() => setShowForm(!showForm)}>
         <Text style={styles.logButtonText}>{showForm ? 'Cancel' : '+ Log Cycle Start'}</Text>
       </TouchableOpacity>
@@ -207,6 +224,10 @@ const styles = StyleSheet.create({
   cardValue: { fontSize: 22, fontWeight: '600', color: '#333' },
   importantCard: { borderLeftWidth: 4, borderLeftColor: '#00897B' },
   tipCard: { borderLeftWidth: 4, borderLeftColor: '#FF9800' },
+  prefCard: { borderLeftWidth: 4, borderLeftColor: '#AB47BC' },
+  prefRow: { flexDirection: 'row', alignItems: 'center', marginTop: 8 },
+  prefBullet: { fontSize: 18, color: '#AB47BC', marginRight: 8, lineHeight: 22 },
+  prefItem: { fontSize: 15, color: '#333' },
   helperText: { marginTop: 6, fontSize: 13, color: '#5f6b6b' },
   tipText: { marginTop: 8, fontSize: 15, color: '#53434b', lineHeight: 22 },
   trendWrap: { flexDirection: 'row', alignItems: 'flex-end', gap: 8, marginTop: 10 },

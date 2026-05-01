@@ -67,6 +67,8 @@ export default function SettingsScreen() {
   const [tryingToConceive, setTryingToConceive] = useState(false);
   const [averagePeriodLength, setAveragePeriodLength] = useState('5');
   const [todayActions, setTodayActions] = useState<string[]>([]);
+  const [partnerPreferences, setPartnerPreferences] = useState<string[]>([]);
+  const [newPreference, setNewPreference] = useState('');
 
   const load = useCallback(async () => {
     const entries = await getCycleEntries();
@@ -80,6 +82,7 @@ export default function SettingsScreen() {
     setTryingToConceive(profile.tryingToConceive);
     setAveragePeriodLength(String(profile.averagePeriodLength));
     setTodayActions(actions);
+    setPartnerPreferences(profile.partnerPreferences ?? []);
   }, []);
 
   useEffect(() => { load(); }, [load]);
@@ -123,8 +126,27 @@ export default function SettingsScreen() {
       partnerName: partnerName.trim(),
       tryingToConceive,
       averagePeriodLength: periodLengthNum,
+      partnerPreferences,
     });
     Alert.alert('Saved', 'Partner profile updated successfully.');
+  };
+
+  const handleAddPreference = async () => {
+    const trimmed = newPreference.trim();
+    if (!trimmed) return;
+    if (partnerPreferences.map((p) => p.toLowerCase()).includes(trimmed.toLowerCase())) return;
+    const updated = [...partnerPreferences, trimmed];
+    setPartnerPreferences(updated);
+    setNewPreference('');
+    const profile = await getPartnerProfile();
+    await savePartnerProfile({ ...profile, partnerPreferences: updated });
+  };
+
+  const handleRemovePreference = async (item: string) => {
+    const updated = partnerPreferences.filter((p) => p !== item);
+    setPartnerPreferences(updated);
+    const profile = await getPartnerProfile();
+    await savePartnerProfile({ ...profile, partnerPreferences: updated });
   };
 
   const handleToggleAction = async (action: string) => {
@@ -172,6 +194,40 @@ export default function SettingsScreen() {
         <TouchableOpacity style={styles.saveButton} onPress={handleSaveProfile}>
           <Text style={styles.saveButtonText}>Save Profile</Text>
         </TouchableOpacity>
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.sectionTitle}>Partner Preferences</Text>
+        <Text style={styles.sub}>
+          Things that help her — you'll be reminded to check these during key phases.
+        </Text>
+
+        <View style={styles.addRow}>
+          <TextInput
+            style={[styles.input, styles.prefInput]}
+            value={newPreference}
+            onChangeText={setNewPreference}
+            placeholder="e.g. chocolate, heat pack, quiet time"
+            maxLength={40}
+            onSubmitEditing={handleAddPreference}
+            returnKeyType="done"
+          />
+          <TouchableOpacity style={styles.addButton} onPress={handleAddPreference}>
+            <Text style={styles.addButtonText}>Add</Text>
+          </TouchableOpacity>
+        </View>
+
+        {partnerPreferences.length === 0 && (
+          <Text style={styles.emptyPref}>No preferences added yet.</Text>
+        )}
+        {partnerPreferences.map((item) => (
+          <View key={item} style={styles.prefItem}>
+            <Text style={styles.prefText}>{item}</Text>
+            <TouchableOpacity onPress={() => handleRemovePreference(item)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <Text style={styles.prefRemove}>✕</Text>
+            </TouchableOpacity>
+          </View>
+        ))}
       </View>
 
       <View style={styles.card}>
@@ -256,4 +312,25 @@ const styles = StyleSheet.create({
   },
   saveButtonText: { color: '#fff', fontWeight: '700' },
   about: { fontSize: 14, color: '#666', lineHeight: 22 },
+  addRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
+  prefInput: { flex: 1, marginBottom: 0 },
+  addButton: {
+    backgroundColor: '#C2185B',
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  addButtonText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  prefItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 9,
+    paddingHorizontal: 4,
+    borderTopWidth: 1,
+    borderTopColor: '#f0f0f0',
+  },
+  prefText: { fontSize: 15, color: '#333', flex: 1 },
+  prefRemove: { fontSize: 16, color: '#aaa', paddingLeft: 12 },
+  emptyPref: { fontSize: 13, color: '#aaa', marginTop: 4, fontStyle: 'italic' },
 });
