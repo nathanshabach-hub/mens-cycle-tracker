@@ -33,10 +33,12 @@ export default function InsightsScreen() {
     const entries = await getCycleEntries();
     const profile = await getPartnerProfile();
     const forecast = predictFertilityWindow(entries);
+    const sorted = [...entries].sort((a, b) => a.startDate.localeCompare(b.startDate));
+    const lastCycleStart = sorted.length > 0 ? sorted[sorted.length - 1].startDate : undefined;
 
     const insights = getMonthlyInsights(entries);
     setMonthlyInsights(insights);
-    setPhases(getCyclePhases(forecast));
+    setPhases(getCyclePhases(forecast, lastCycleStart));
 
     if (insights.length > 0) {
       setSelectedMonth(insights[0]);

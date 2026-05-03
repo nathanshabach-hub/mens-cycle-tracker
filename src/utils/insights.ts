@@ -20,11 +20,11 @@ export interface MonthlyInsights {
   phases: CyclePhase[];
 }
 
-export function getCyclePhases(forecast: FertilityForecast | null): CyclePhase[] {
+export function getCyclePhases(forecast: FertilityForecast | null, lastCycleStart?: string): CyclePhase[] {
   if (!forecast) return [];
 
   const { nextCycleStart, ovulationDate, fertileWindowStart, fertileWindowEnd } = forecast;
-  const today = format(new Date(), 'yyyy-MM-dd');
+  const cycleStart = lastCycleStart ?? format(new Date(), 'yyyy-MM-dd');
 
   const phases: CyclePhase[] = [
     {
@@ -32,16 +32,16 @@ export function getCyclePhases(forecast: FertilityForecast | null): CyclePhase[]
       description: 'Rest & hydration phase',
       emoji: '🔴',
       color: '#E91E63',
-      start: today,
-      end: addDays(parseISO(today), 4).toISOString().split('T')[0],
+      start: cycleStart,
+      end: format(addDays(parseISO(cycleStart), 4), 'yyyy-MM-dd'),
     },
     {
       name: 'Follicular',
       description: 'Energy & growth phase',
       emoji: '🟡',
       color: '#FFC107',
-      start: addDays(parseISO(today), 5).toISOString().split('T')[0],
-      end: addDays(parseISO(fertileWindowStart), -1).toISOString().split('T')[0],
+      start: format(addDays(parseISO(cycleStart), 5), 'yyyy-MM-dd'),
+      end: format(addDays(parseISO(fertileWindowStart), -1), 'yyyy-MM-dd'),
     },
     {
       name: 'Fertile Window',
@@ -64,8 +64,8 @@ export function getCyclePhases(forecast: FertilityForecast | null): CyclePhase[]
       description: 'Stability & introspection',
       emoji: '🔵',
       color: '#3949AB',
-      start: addDays(parseISO(ovulationDate), 1).toISOString().split('T')[0],
-      end: addDays(parseISO(nextCycleStart), -1).toISOString().split('T')[0],
+      start: format(addDays(parseISO(ovulationDate), 1), 'yyyy-MM-dd'),
+      end: format(addDays(parseISO(nextCycleStart), -1), 'yyyy-MM-dd'),
     },
   ];
 
