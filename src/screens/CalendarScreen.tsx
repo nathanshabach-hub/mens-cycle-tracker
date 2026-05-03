@@ -23,9 +23,9 @@ export default function CalendarScreen() {
     if (forecast) {
       marks[forecast.nextCycleStart] = {
         marked: true,
-        dotColor: '#00695C',
+        dotColor: '#E65100',
         selected: true,
-        selectedColor: '#F6F3F5',
+        selectedColor: '#FFB74D',
       };
 
       let cursor = parseISO(forecast.fertileWindowStart);
@@ -34,9 +34,9 @@ export default function CalendarScreen() {
         const key = format(cursor, 'yyyy-MM-dd');
         marks[key] = {
           marked: true,
-          dotColor: '#00695C',
+          dotColor: '#6A1B9A',
           selected: true,
-          selectedColor: '#F6F3F5',
+          selectedColor: '#CE93D8',
         };
         cursor = addDays(cursor, 1);
       }
@@ -93,16 +93,16 @@ export default function CalendarScreen() {
           <Text style={styles.legendText}>Cycle Start</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.dot, { backgroundColor: '#F6F3F5' }]} />
+          <View style={[styles.dot, { backgroundColor: '#FFB74D' }]} />
           <Text style={styles.legendText}>Predicted Next</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.dot, { backgroundColor: '#F6F3F5' }]} />
+          <View style={[styles.dot, { backgroundColor: '#CE93D8' }]} />
           <Text style={styles.legendText}>Fertile Window</Text>
         </View>
         <View style={styles.legendItem}>
           <View style={[styles.dot, { backgroundColor: '#4DB6AC' }]} />
-          <Text style={styles.legendText}>Ovulation Day</Text>
+          <Text style={styles.legendText}>Ovulation</Text>
         </View>
       </View>
 
