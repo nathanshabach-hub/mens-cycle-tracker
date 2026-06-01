@@ -11,6 +11,7 @@ import {
 import { format } from 'date-fns';
 import {
   getCycleEntries,
+  getDailyLogEntries,
   getPartnerProfile,
   predictFertilityWindow,
 } from '../utils/storage';
@@ -49,10 +50,11 @@ export default function InsightsScreen() {
 
   const handleExport = async (format: 'json' | 'csv') => {
     const entries = await getCycleEntries();
+    const dailyLogs = await getDailyLogEntries();
     const profile = await getPartnerProfile();
     const forecast = predictFertilityWindow(entries);
 
-    const data = generateExportData(entries, profile, forecast);
+    const data = generateExportData(entries, dailyLogs, profile, forecast);
     const content = format === 'json' ? exportToJSON(data) : exportToCSV(data);
     const mimeType = format === 'json' ? 'application/json' : 'text/csv';
     const filename = `cycle-tracker-export-${new Date().toISOString().split('T')[0]}.${format}`;

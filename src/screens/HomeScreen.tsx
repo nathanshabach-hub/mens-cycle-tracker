@@ -7,6 +7,7 @@ import { format, parseISO } from 'date-fns';
 import {
   getCycleEntries,
   saveCycleEntry,
+  saveDailyLogEntry,
   predictFertilityWindow,
   getRegularityScore,
   getRecentCycleLengths,
@@ -37,8 +38,10 @@ export default function HomeScreen() {
   const [partnerPreferences, setPartnerPreferences] = useState<string[]>([]);
   const [currentPhase, setCurrentPhase] = useState<CyclePhase | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [entryMode, setEntryMode] = useState<'cycle' | 'daily'>('cycle');
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
-  const [selectedMood, setSelectedMood] = useState<MoodOption>('Neutral');
+  const [selectedEndDate, setSelectedEndDate] = useState('');
+  const [selectedMoods, setSelectedMoods] = useState<MoodOption[]>(['Neutral']);
   const [moodSearch, setMoodSearch] = useState('');
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [symptomSearch, setSymptomSearch] = useState('');
@@ -92,25 +95,51 @@ export default function HomeScreen() {
     );
   };
 
+  const toggleMood = (mood: MoodOption) => {
+    setSelectedMoods((prev) =>
+      prev.includes(mood) ? prev.filter((m) => m !== mood) : [...prev, mood]
+    );
+  };
+
   const handleSave = async () => {
     if (!selectedDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
       Alert.alert('Invalid date', 'Please enter a date in YYYY-MM-DD format.');
       return;
     }
-    const entry: CycleEntry = {
-      id: selectedDate,
-      startDate: selectedDate,
-      mood: selectedMood,
-      symptoms: selectedSymptoms,
-      notes: notes.trim(),
-    };
-    await saveCycleEntry(entry);
+    if (selectedEndDate && !selectedEndDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      Alert.alert('Invalid end date', 'Please enter end date as YYYY-MM-DD.');
+      return;
+    }
+
+    if (entryMode === 'cycle') {
+      const entry: CycleEntry = {
+        id: selectedDate,
+        startDate: selectedDate,
+        endDate: selectedEndDate || undefined,
+        mood: selectedMoods[0] ?? 'Neutral',
+        moods: selectedMoods,
+        symptoms: selectedSymptoms,
+        notes: notes.trim(),
+      };
+      await saveCycleEntry(entry);
+    } else {
+      await saveDailyLogEntry({
+        id: selectedDate,
+        date: selectedDate,
+        moods: selectedMoods,
+        symptoms: selectedSymptoms,
+        notes: notes.trim(),
+      });
+    }
+
     setShowForm(false);
     setSelectedSymptoms([]);
     setSymptomSearch('');
     setMoodSearch('');
     setNotes('');
-    setSelectedMood('Neutral');
+    setSelectedMoods(['Neutral']);
+    setSelectedEndDate('');
+    setEntryMode('cycle');
     setSelectedDate(format(new Date(), 'yyyy-MM-dd'));
     load();
   };
@@ -203,7 +232,29 @@ export default function HomeScreen() {
 
         {showForm && (
           <View style={styles.form}>
-            <Text style={styles.label}>Start Date (YYYY-MM-DD)</Text>
+            <Text style={styles.label}>Entry Type</Text>
+            <View style={styles.entryModeRow}>
+              <TouchableOpacity
+                style={[styles.modeChip, entryMode === 'cycle' && styles.modeChipActive]}
+                onPress={() => setEntryMode('cycle')}
+              >
+                <Text style={[styles.modeChipText, entryMode === 'cycle' && styles.modeChipTextActive]}>
+                  Cycle Start
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modeChip, entryMode === 'daily' && styles.modeChipActive]}
+                onPress={() => setEntryMode('daily')}
+              >
+                <Text style={[styles.modeChipText, entryMode === 'daily' && styles.modeChipTextActive]}>
+                  Daily Log
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.label}>
+              {entryMode === 'cycle' ? 'Cycle Start Date (YYYY-MM-DD)' : 'Log Date (YYYY-MM-DD)'}
+            </Text>
             <TextInput
               style={styles.input}
               value={selectedDate}
@@ -211,6 +262,19 @@ export default function HomeScreen() {
               placeholder="e.g. 2026-04-27"
               maxLength={10}
             />
+
+            {entryMode === 'cycle' && (
+              <>
+                <Text style={styles.label}>Cycle End Date (optional)</Text>
+                <TextInput
+                  style={styles.input}
+                  value={selectedEndDate}
+                  onChangeText={setSelectedEndDate}
+                  placeholder="e.g. 2026-05-01"
+                  maxLength={10}
+                />
+              </>
+            )}
 
             <Text style={styles.label}>Mood</Text>
             <TextInput
@@ -227,17 +291,21 @@ export default function HomeScreen() {
                 filteredMoods.map((mood) => (
                   <TouchableOpacity
                     key={mood}
-                    style={[styles.chip, selectedMood === mood && styles.chipSelected]}
-                    onPress={() => setSelectedMood(mood)}
+                    style={[styles.chip, selectedMoods.includes(mood) && styles.chipSelected]}
+                    onPress={() => toggleMood(mood)}
                   >
-                    <Text style={[styles.chipText, selectedMood === mood && styles.chipTextSelected]}>
+                    <Text style={[styles.chipText, selectedMoods.includes(mood) && styles.chipTextSelected]}>
                       {mood}
                     </Text>
                   </TouchableOpacity>
                 ))
               )}
             </ScrollView>
-            <Text style={styles.selectedCount}>Selected: {selectedMood}</Text>
+            {selectedMoods.length > 0 ? (
+              <Text style={styles.selectedCount}>{selectedMoods.length} selected: {selectedMoods.join(', ')}</Text>
+            ) : (
+              <Text style={styles.selectedCount}>No moods selected</Text>
+            )}
 
             <Text style={styles.label}>Symptoms</Text>
             <TextInput
@@ -279,7 +347,9 @@ export default function HomeScreen() {
             />
 
             <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-              <Text style={styles.saveButtonText}>Save Entry</Text>
+              <Text style={styles.saveButtonText}>
+                {entryMode === 'cycle' ? 'Save Cycle Entry' : 'Save Daily Log'}
+              </Text>
             </TouchableOpacity>
           </View>
         )}
@@ -291,7 +361,7 @@ export default function HomeScreen() {
       <View style={styles.stickyFooter}>
         <View style={[styles.stickyInner, isWide && styles.stickyInnerWide]}>
           <TouchableOpacity style={styles.logButton} onPress={() => setShowForm(!showForm)}>
-            <Text style={styles.logButtonText}>{showForm ? 'Cancel' : '+ Log Cycle Start'}</Text>
+            <Text style={styles.logButtonText}>{showForm ? 'Cancel' : '+ Log Entry'}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -383,6 +453,17 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: '#eee', borderRadius: 8,
     backgroundColor: '#fafafa',
   },
+  entryModeRow: { flexDirection: 'row', gap: 8, marginBottom: 4 },
+  modeChip: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 18,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  modeChipActive: { backgroundColor: '#00695C', borderColor: '#00695C' },
+  modeChipText: { color: '#555', fontSize: 13, fontWeight: '600' },
+  modeChipTextActive: { color: '#fff' },
   noResults: { color: '#aaa', fontSize: 13, padding: 8, fontStyle: 'italic' },
   selectedCount: { marginTop: 6, fontSize: 12, color: '#00695C', fontStyle: 'italic' },
   chip: {

@@ -2,12 +2,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { addDays, parseISO, format } from 'date-fns';
 import {
   CycleEntry,
+  DailyLogEntry,
   AVERAGE_CYCLE_LENGTH,
   FertilityForecast,
   PartnerProfile,
 } from '../types';
 
 const STORAGE_KEY = 'cycle_entries';
+const DAILY_LOGS_KEY = 'daily_logs';
 const PROFILE_KEY = 'partner_profile';
 const SUPPORT_ACTIONS_PREFIX = 'support_actions_';
 
@@ -40,6 +42,30 @@ export async function deleteCycleEntry(id: string): Promise<void> {
   const entries = await getCycleEntries();
   const filtered = entries.filter((e) => e.id !== id);
   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+}
+
+export async function getDailyLogEntries(): Promise<DailyLogEntry[]> {
+  const raw = await AsyncStorage.getItem(DAILY_LOGS_KEY);
+  if (!raw) return [];
+  return JSON.parse(raw) as DailyLogEntry[];
+}
+
+export async function saveDailyLogEntry(entry: DailyLogEntry): Promise<void> {
+  const entries = await getDailyLogEntries();
+  const existing = entries.findIndex((e) => e.id === entry.id);
+  if (existing >= 0) {
+    entries[existing] = entry;
+  } else {
+    entries.push(entry);
+  }
+  entries.sort((a, b) => a.date.localeCompare(b.date));
+  await AsyncStorage.setItem(DAILY_LOGS_KEY, JSON.stringify(entries));
+}
+
+export async function deleteDailyLogEntry(id: string): Promise<void> {
+  const entries = await getDailyLogEntries();
+  const filtered = entries.filter((e) => e.id !== id);
+  await AsyncStorage.setItem(DAILY_LOGS_KEY, JSON.stringify(filtered));
 }
 
 export async function getPartnerProfile(): Promise<PartnerProfile> {

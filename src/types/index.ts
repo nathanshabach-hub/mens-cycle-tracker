@@ -1,8 +1,18 @@
 export interface CycleEntry {
   id: string;
   startDate: string; // ISO date string YYYY-MM-DD
+  endDate?: string; // optional confirmed cycle end date
   symptoms: string[];
-  mood: string;
+  mood: string; // legacy single mood value
+  moods?: string[]; // optional multi-select moods for newer entries
+  notes: string;
+}
+
+export interface DailyLogEntry {
+  id: string;
+  date: string; // ISO date string YYYY-MM-DD
+  moods: string[];
+  symptoms: string[];
   notes: string;
 }
 
