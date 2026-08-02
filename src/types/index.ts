@@ -14,8 +14,10 @@ export interface DailyLogEntry {
   moods: string[];
   symptoms: string[];
   notes: string;
-  ovulationTestResult?: 'Positive' | 'Negative'; // Added for tracking hormone tests
-  pregnancyTestResult?: 'Positive' | 'Negative'; // Added for tracking pregnancy tests
+  ovulationTestResult?: 'Positive' | 'Negative'; // Tracking hormone tests
+  pregnancyTestResult?: 'Positive' | 'Negative'; // Tracking pregnancy tests
+  intimacyLogged?: boolean; // Added for intimacy tracking
+  protectionUsed?: boolean; // Optional protection status flag
 }
 
 export interface FertilityForecast {
