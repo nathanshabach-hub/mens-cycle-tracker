@@ -14,6 +14,8 @@ export interface DailyLogEntry {
   moods: string[];
   symptoms: string[];
   notes: string;
+  ovulationTestResult?: 'Positive' | 'Negative'; // Added for tracking hormone tests
+  pregnancyTestResult?: 'Positive' | 'Negative'; // Added for tracking pregnancy tests
 }
 
 export interface FertilityForecast {
@@ -29,6 +31,7 @@ export interface PartnerProfile {
   tryingToConceive: boolean;
   averagePeriodLength: number;
   partnerPreferences: string[];
+  pregnancyMode?: boolean; // Added to support toggling pregnancy view mode
 }
 
 export type MoodOption =
