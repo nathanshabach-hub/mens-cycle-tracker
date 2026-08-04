@@ -6,12 +6,14 @@ import {
   AVERAGE_CYCLE_LENGTH,
   FertilityForecast,
   PartnerProfile,
+  AppColors,
 } from '../types';
 
 const STORAGE_KEY = 'cycle_entries';
 const DAILY_LOGS_KEY = 'daily_logs';
 const PROFILE_KEY = 'partner_profile';
 const SUPPORT_ACTIONS_PREFIX = 'support_actions_';
+const APP_COLORS_KEY = 'app_colors';
 
 export const DEFAULT_PARTNER_PROFILE: PartnerProfile = {
   partnerName: '',
@@ -19,6 +21,21 @@ export const DEFAULT_PARTNER_PROFILE: PartnerProfile = {
   averagePeriodLength: 5,
   partnerPreferences: [],
 };
+
+export const DEFAULT_APP_COLORS: AppColors = {
+  primary: '#00695C',
+  secondary: '#00897B',
+  background: '#F4F9F8',
+  card: '#FFFFFF',
+  text: '#333333',
+  muted: '#888888',
+};
+
+function normalizeHexColor(value: string, fallback: string): string {
+  const cleaned = value.trim();
+  if (/^#[0-9A-Fa-f]{6}$/.test(cleaned)) return cleaned.toUpperCase();
+  return fallback;
+}
 
 export async function getCycleEntries(): Promise<CycleEntry[]> {
   const raw = await AsyncStorage.getItem(STORAGE_KEY);
@@ -76,6 +93,33 @@ export async function getPartnerProfile(): Promise<PartnerProfile> {
 
 export async function savePartnerProfile(profile: PartnerProfile): Promise<void> {
   await AsyncStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+}
+
+export async function getAppColors(): Promise<AppColors> {
+  const raw = await AsyncStorage.getItem(APP_COLORS_KEY);
+  if (!raw) return DEFAULT_APP_COLORS;
+
+  const parsed = JSON.parse(raw) as Partial<AppColors>;
+  return {
+    primary: normalizeHexColor(parsed.primary ?? '', DEFAULT_APP_COLORS.primary),
+    secondary: normalizeHexColor(parsed.secondary ?? '', DEFAULT_APP_COLORS.secondary),
+    background: normalizeHexColor(parsed.background ?? '', DEFAULT_APP_COLORS.background),
+    card: normalizeHexColor(parsed.card ?? '', DEFAULT_APP_COLORS.card),
+    text: normalizeHexColor(parsed.text ?? '', DEFAULT_APP_COLORS.text),
+    muted: normalizeHexColor(parsed.muted ?? '', DEFAULT_APP_COLORS.muted),
+  };
+}
+
+export async function saveAppColors(colors: AppColors): Promise<void> {
+  const safeColors: AppColors = {
+    primary: normalizeHexColor(colors.primary, DEFAULT_APP_COLORS.primary),
+    secondary: normalizeHexColor(colors.secondary, DEFAULT_APP_COLORS.secondary),
+    background: normalizeHexColor(colors.background, DEFAULT_APP_COLORS.background),
+    card: normalizeHexColor(colors.card, DEFAULT_APP_COLORS.card),
+    text: normalizeHexColor(colors.text, DEFAULT_APP_COLORS.text),
+    muted: normalizeHexColor(colors.muted, DEFAULT_APP_COLORS.muted),
+  };
+  await AsyncStorage.setItem(APP_COLORS_KEY, JSON.stringify(safeColors));
 }
 
 function getSupportActionsKey(date: string): string {
@@ -201,7 +245,22 @@ export function getDailySupportTip(
 export function getMarkedDates(entries: CycleEntry[]): Record<string, { marked: boolean; dotColor: string; selected?: boolean; selectedColor?: string }> {
   const marked: Record<string, { marked: boolean; dotColor: string; selected?: boolean; selectedColor?: string }> = {};
   entries.forEach((entry) => {
-    marked[entry.startDate] = { marked: true, dotColor: '#E91E63', selected: true, selectedColor: '#E91E63' };
+    if (!entry.endDate) {
+      marked[entry.startDate] = { marked: true, dotColor: '#E91E63' };
+      return;
+    }
+
+    try {
+      let cursor = parseISO(entry.startDate);
+      const end = parseISO(entry.endDate);
+      while (cursor <= end) {
+        const key = format(cursor, 'yyyy-MM-dd');
+        marked[key] = { marked: true, dotColor: '#E91E63' };
+        cursor = addDays(cursor, 1);
+      }
+    } catch {
+      marked[entry.startDate] = { marked: true, dotColor: '#E91E63' };
+    }
   });
   return marked;
 }

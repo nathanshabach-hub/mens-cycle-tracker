@@ -5,30 +5,42 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
-  Share,
+  Switch,
 } from 'react-native';
-import { format } from 'date-fns';
 import {
   getCycleEntries,
-  getDailyLogEntries,
   getPartnerProfile,
   predictFertilityWindow,
 } from '../utils/storage';
+import { DEFAULT_APP_COLORS } from '../utils/storage';
 import {
   getMonthlyInsights,
   getCyclePhases,
-  generateExportData,
-  exportToJSON,
-  exportToCSV,
   MonthlyInsights,
   CyclePhase,
 } from '../utils/insights';
+import { AppColors } from '../types';
+import { useAppTheme } from '../theme/AppThemeContext';
+
+const DARK_THEME_COLORS: AppColors = {
+  primary: '#7DD3FC',
+  secondary: '#22D3EE',
+  background: '#0F172A',
+  card: '#1E293B',
+  text: '#E2E8F0',
+  muted: '#94A3B8',
+};
 
 export default function InsightsScreen() {
+  const { colors, setColors } = useAppTheme();
+  const borderSoft = `${colors.muted}33`;
   const [monthlyInsights, setMonthlyInsights] = useState<MonthlyInsights[]>([]);
   const [phases, setPhases] = useState<CyclePhase[]>([]);
   const [selectedMonth, setSelectedMonth] = useState<MonthlyInsights | null>(null);
+
+  const isDarkMode =
+    colors.background.toUpperCase() === DARK_THEME_COLORS.background &&
+    colors.card.toUpperCase() === DARK_THEME_COLORS.card;
 
   const load = useCallback(async () => {
     const entries = await getCycleEntries();
@@ -48,42 +60,40 @@ export default function InsightsScreen() {
 
   useEffect(() => { load(); }, [load]);
 
-  const handleExport = async (format: 'json' | 'csv') => {
-    const entries = await getCycleEntries();
-    const dailyLogs = await getDailyLogEntries();
-    const profile = await getPartnerProfile();
-    const forecast = predictFertilityWindow(entries);
-
-    const data = generateExportData(entries, dailyLogs, profile, forecast);
-    const content = format === 'json' ? exportToJSON(data) : exportToCSV(data);
-    const mimeType = format === 'json' ? 'application/json' : 'text/csv';
-    const filename = `cycle-tracker-export-${new Date().toISOString().split('T')[0]}.${format}`;
-
-    try {
-      await Share.share({
-        message: content,
-        title: filename,
-        url: undefined,
-      });
-    } catch (error) {
-      Alert.alert('Export failed', 'Could not export data.');
+  const handleToggleDarkMode = async (enabled: boolean) => {
+    if (enabled) {
+      await setColors(DARK_THEME_COLORS);
+      return;
     }
+    await setColors(DEFAULT_APP_COLORS);
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Insights & Analytics</Text>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]} contentContainerStyle={styles.content}>
+      <View style={styles.headerRow}>
+        <View style={styles.headerSpacer} />
+        <Text style={[styles.title, { color: colors.primary }]}>Insights & Analytics</Text>
+        <View style={styles.headerDarkModeControl}>
+          <Text style={[styles.darkModeIcon, { color: colors.primary }]}>🌙</Text>
+          <Switch
+            style={styles.darkModeSwitch}
+            value={isDarkMode}
+            onValueChange={handleToggleDarkMode}
+            trackColor={{ true: colors.primary }}
+          />
+        </View>
+      </View>
 
       {monthlyInsights.length === 0 ? (
-        <View style={styles.card}>
-          <Text style={styles.hint}>
+        <View style={[styles.card, { backgroundColor: colors.card }]}>
+          <Text style={[styles.hint, { color: colors.muted }]}>
             Log at least 2 cycle start dates to unlock insights and analytics.
           </Text>
         </View>
       ) : (
         <>
-          <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Monthly Patterns</Text>
+          <View style={[styles.card, { backgroundColor: colors.card }]}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Monthly Patterns</Text>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -94,14 +104,18 @@ export default function InsightsScreen() {
                   key={index}
                   style={[
                     styles.monthButton,
+                    { backgroundColor: colors.card, borderColor: borderSoft },
                     selectedMonth?.month === insight.month && styles.monthButtonActive,
+                    selectedMonth?.month === insight.month && { borderColor: colors.primary, backgroundColor: colors.background },
                   ]}
                   onPress={() => setSelectedMonth(insight)}
                 >
                   <Text
                     style={[
                       styles.monthButtonText,
+                      { color: colors.muted },
                       selectedMonth?.month === insight.month && styles.monthButtonTextActive,
+                      selectedMonth?.month === insight.month && { color: colors.primary },
                     ]}
                   >
                     {insight.month}
@@ -111,20 +125,20 @@ export default function InsightsScreen() {
             </ScrollView>
 
             {selectedMonth && (
-              <View style={styles.monthDetails}>
-                <View style={styles.statRow}>
-                  <Text style={styles.statLabel}>Cycles Logged</Text>
-                  <Text style={styles.statValue}>{selectedMonth.cycleCount}</Text>
+              <View style={[styles.monthDetails, { borderTopColor: borderSoft }]}>
+                <View style={[styles.statRow, { borderBottomColor: borderSoft }]}> 
+                  <Text style={[styles.statLabel, { color: colors.muted }]}>Cycles Logged</Text>
+                  <Text style={[styles.statValue, { color: colors.text }]}>{selectedMonth.cycleCount}</Text>
                 </View>
                 {selectedMonth.shortestCycle !== 999 && (
                   <>
-                    <View style={styles.statRow}>
-                      <Text style={styles.statLabel}>Shortest Cycle</Text>
-                      <Text style={styles.statValue}>{selectedMonth.shortestCycle} days</Text>
+                    <View style={[styles.statRow, { borderBottomColor: borderSoft }]}> 
+                      <Text style={[styles.statLabel, { color: colors.muted }]}>Shortest Cycle</Text>
+                      <Text style={[styles.statValue, { color: colors.text }]}>{selectedMonth.shortestCycle} days</Text>
                     </View>
-                    <View style={styles.statRow}>
-                      <Text style={styles.statLabel}>Longest Cycle</Text>
-                      <Text style={styles.statValue}>{selectedMonth.longestCycle} days</Text>
+                    <View style={[styles.statRow, { borderBottomColor: borderSoft }]}> 
+                      <Text style={[styles.statLabel, { color: colors.muted }]}>Longest Cycle</Text>
+                      <Text style={[styles.statValue, { color: colors.text }]}>{selectedMonth.longestCycle} days</Text>
                     </View>
                   </>
                 )}
@@ -132,54 +146,30 @@ export default function InsightsScreen() {
             )}
           </View>
 
-          <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Current Cycle Phases</Text>
+          <View style={[styles.card, { backgroundColor: colors.card }]}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Current Cycle Phases</Text>
             {phases.length > 0 ? (
               phases.map((phase, index) => (
-                <View key={index} style={styles.phaseCard}>
+                <View key={index} style={[styles.phaseCard, { backgroundColor: colors.background, borderLeftColor: colors.secondary }]}>
                   <View style={styles.phaseHeader}>
                     <Text style={styles.phaseEmoji}>{phase.emoji}</Text>
                     <View style={styles.phaseMeta}>
-                      <Text style={styles.phaseName}>{phase.name}</Text>
-                      <Text style={styles.phaseDate}>
+                      <Text style={[styles.phaseName, { color: colors.text }]}>{phase.name}</Text>
+                      <Text style={[styles.phaseDate, { color: colors.muted }]}>
                         {phase.start} → {phase.end}
                       </Text>
                     </View>
                   </View>
-                  <Text style={styles.phaseDesc}>{phase.description}</Text>
+                  <Text style={[styles.phaseDesc, { color: colors.muted }]}>{phase.description}</Text>
                 </View>
               ))
             ) : (
-              <Text style={styles.hint}>No forecast available yet.</Text>
+              <Text style={[styles.hint, { color: colors.muted }]}>No forecast available yet.</Text>
             )}
           </View>
         </>
       )}
 
-      <View style={styles.card}>
-        <Text style={styles.sectionTitle}>Export & Share</Text>
-        <Text style={styles.helperText}>
-          Export your cycle data as a privacy-safe summary for sharing or backup.
-        </Text>
-
-        <TouchableOpacity
-          style={styles.exportButton}
-          onPress={() => handleExport('json')}
-        >
-          <Text style={styles.exportButtonText}>📋 Export as JSON</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.exportButton, styles.exportButtonSecondary]}
-          onPress={() => handleExport('csv')}
-        >
-          <Text style={styles.exportButtonText}>📊 Export as CSV</Text>
-        </TouchableOpacity>
-
-        <Text style={[styles.helperText, { marginTop: 12, fontSize: 12 }]}>
-          Data remains on your device. Exports are for personal backup and sharing only.
-        </Text>
-      </View>
     </ScrollView>
   );
 }
@@ -187,7 +177,22 @@ export default function InsightsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F4F9F8' },
   content: { padding: 16, paddingBottom: 40 },
-  title: { fontSize: 28, fontWeight: '700', color: '#00695C', marginBottom: 20, textAlign: 'center' },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  headerSpacer: { width: 58 },
+  title: { flex: 1, fontSize: 26, fontWeight: '700', color: '#00695C', textAlign: 'center' },
+  headerDarkModeControl: {
+    width: 58,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: 4,
+  },
+  darkModeIcon: { fontSize: 16 },
+  darkModeSwitch: { transform: [{ scale: 0.85 }] },
   card: {
     backgroundColor: '#fff',
     borderRadius: 12,
@@ -200,7 +205,6 @@ const styles = StyleSheet.create({
   },
   sectionTitle: { fontSize: 16, fontWeight: '700', color: '#333', marginBottom: 12 },
   hint: { fontSize: 14, color: '#aaa', textAlign: 'center', lineHeight: 22 },
-  helperText: { fontSize: 13, color: '#888', marginBottom: 8 },
   monthScroll: { marginBottom: 12 },
   monthButton: {
     borderWidth: 2,
@@ -238,13 +242,4 @@ const styles = StyleSheet.create({
   phaseName: { fontSize: 14, fontWeight: '700', color: '#333' },
   phaseDate: { fontSize: 12, color: '#888', marginTop: 2 },
   phaseDesc: { fontSize: 12, color: '#666', fontStyle: 'italic' },
-  exportButton: {
-    backgroundColor: '#00695C',
-    borderRadius: 10,
-    paddingVertical: 12,
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  exportButtonSecondary: { backgroundColor: '#00897B' },
-  exportButtonText: { color: '#fff', fontWeight: '700', fontSize: 15 },
 });

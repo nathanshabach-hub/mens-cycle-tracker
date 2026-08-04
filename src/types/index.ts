@@ -36,6 +36,15 @@ export interface PartnerProfile {
   pregnancyMode?: boolean; // Added to support toggling pregnancy view mode
 }
 
+export interface AppColors {
+  primary: string;
+  secondary: string;
+  background: string;
+  card: string;
+  text: string;
+  muted: string;
+}
+
 export type MoodOption =
   // Positive / high-energy (follicular & ovulation phases)
   | 'Happy'

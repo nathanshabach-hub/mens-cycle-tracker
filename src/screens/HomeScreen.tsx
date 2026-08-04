@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView,
-  TextInput, Alert, useWindowDimensions,
+  TextInput, Alert, useWindowDimensions, Switch,
 } from 'react-native';
 import { format, parseISO } from 'date-fns';
 import {
   getCycleEntries,
+  DEFAULT_APP_COLORS,
   saveCycleEntry,
   saveDailyLogEntry,
   predictFertilityWindow,
@@ -15,7 +16,17 @@ import {
   getPartnerProfile,
 } from '../utils/storage';
 import { getCyclePhases, CyclePhase } from '../utils/insights';
-import { CycleEntry, MOOD_OPTIONS, SYMPTOM_OPTIONS, MoodOption } from '../types';
+import { AppColors, CycleEntry, MOOD_OPTIONS, SYMPTOM_OPTIONS, MoodOption } from '../types';
+import { useAppTheme } from '../theme/AppThemeContext';
+
+const DARK_THEME_COLORS: AppColors = {
+  primary: '#7DD3FC',
+  secondary: '#22D3EE',
+  background: '#0F172A',
+  card: '#1E293B',
+  text: '#E2E8F0',
+  muted: '#94A3B8',
+};
 
 function readableDate(dateStr: string | null | undefined): string {
   if (!dateStr) return '—';
@@ -23,6 +34,8 @@ function readableDate(dateStr: string | null | undefined): string {
 }
 
 export default function HomeScreen() {
+  const { colors, setColors } = useAppTheme();
+  const borderSoft = `${colors.muted}33`;
   const { width } = useWindowDimensions();
   const isWide = width > 600;
 
@@ -46,6 +59,10 @@ export default function HomeScreen() {
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [symptomSearch, setSymptomSearch] = useState('');
   const [notes, setNotes] = useState('');
+
+  const isDarkMode =
+    colors.background.toUpperCase() === DARK_THEME_COLORS.background &&
+    colors.card.toUpperCase() === DARK_THEME_COLORS.card;
 
   const filteredMoods = useMemo(() => {
     const q = moodSearch.trim().toLowerCase();
@@ -88,6 +105,14 @@ export default function HomeScreen() {
   }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  const handleToggleDarkMode = async (enabled: boolean) => {
+    if (enabled) {
+      await setColors(DARK_THEME_COLORS);
+      return;
+    }
+    await setColors(DEFAULT_APP_COLORS);
+  };
 
   const toggleSymptom = (symptom: string) => {
     setSelectedSymptoms((prev) =>
@@ -149,53 +174,65 @@ export default function HomeScreen() {
   const scoreColor = score >= 80 ? '#4CAF50' : score >= 50 ? '#3949AB' : '#EF5350';
 
   return (
-    <View style={styles.screenContainer}>
+    <View style={[styles.screenContainer, { backgroundColor: colors.background }]}>
       <ScrollView style={styles.container} contentContainerStyle={[styles.content, isWide && styles.contentWide]}>
-        <Text style={styles.title}>Cycle Tracker</Text>
-        {partnerName ? <Text style={styles.subtitle}>Tracking for {partnerName}</Text> : null}
+        <View style={styles.headerRow}>
+          <View style={styles.headerSpacer} />
+          <Text style={[styles.title, { color: colors.primary }]}>Cycle Tracker</Text>
+          <View style={styles.headerDarkModeControl}>
+            <Text style={[styles.darkModeIcon, { color: colors.primary }]}>🌙</Text>
+            <Switch
+              style={styles.darkModeSwitch}
+              value={isDarkMode}
+              onValueChange={handleToggleDarkMode}
+              trackColor={{ true: colors.primary }}
+            />
+          </View>
+        </View>
+        {partnerName ? <Text style={[styles.subtitle, { color: colors.muted }]}>Tracking for {partnerName}</Text> : null}
 
         {/* Phase Banner */}
         {currentPhase && (
-          <View style={[styles.phaseBanner, { borderLeftColor: currentPhase.color }]}>
+          <View style={[styles.phaseBanner, { borderLeftColor: currentPhase.color, backgroundColor: colors.card }]}> 
             <Text style={styles.phaseEmoji}>{currentPhase.emoji}</Text>
             <View style={styles.phaseInfo}>
-              <Text style={styles.phaseLabel}>Current Phase</Text>
+              <Text style={[styles.phaseLabel, { color: colors.muted }]}>Current Phase</Text>
               <Text style={[styles.phaseName, { color: currentPhase.color }]}>{currentPhase.name}</Text>
-              <Text style={styles.phaseDesc}>{currentPhase.description}</Text>
+              <Text style={[styles.phaseDesc, { color: colors.muted }]}>{currentPhase.description}</Text>
             </View>
           </View>
         )}
 
         {/* 2-column row for top two cards */}
         <View style={styles.row}>
-          <View style={[styles.card, styles.halfCard]}>
-            <Text style={styles.cardLabel}>Last Cycle Started</Text>
-            <Text style={styles.cardValue}>{readableDate(lastEntry?.startDate)}</Text>
+          <View style={[styles.card, styles.halfCard, { backgroundColor: colors.card }]}> 
+            <Text style={[styles.cardLabel, { color: colors.muted }]}>Last Cycle Started</Text>
+            <Text style={[styles.cardValue, { color: colors.text }]}>{readableDate(lastEntry?.startDate)}</Text>
           </View>
-          <View style={[styles.card, styles.halfCard]}>
-            <Text style={styles.cardLabel}>Next Predicted Cycle</Text>
-            <Text style={[styles.cardValue, { color: '#00695C' }]}>{readableDate(nextCycle)}</Text>
+          <View style={[styles.card, styles.halfCard, { backgroundColor: colors.card }]}>
+            <Text style={[styles.cardLabel, { color: colors.muted }]}>Next Predicted Cycle</Text>
+            <Text style={[styles.cardValue, { color: colors.primary }]}>{readableDate(nextCycle)}</Text>
           </View>
         </View>
 
-        <View style={[styles.card, styles.importantCard]}>
-          <Text style={styles.cardLabel}>Predicted Ovulation Day</Text>
-          <Text style={[styles.cardValue, { color: '#00897B' }]}>{readableDate(ovulationDate)}</Text>
-          <Text style={styles.helperText}>Fertile window: {fertileWindow ?? '—'}</Text>
-          <Text style={styles.helperText}>Average cycle length used: {avgCycleLength ?? 28} days</Text>
+        <View style={[styles.card, styles.importantCard, { backgroundColor: colors.card, borderLeftColor: colors.secondary }]}>
+          <Text style={[styles.cardLabel, { color: colors.muted }]}>Predicted Ovulation Day</Text>
+          <Text style={[styles.cardValue, { color: colors.secondary }]}>{readableDate(ovulationDate)}</Text>
+          <Text style={[styles.helperText, { color: colors.muted }]}>Fertile window: {fertileWindow ?? '—'}</Text>
+          <Text style={[styles.helperText, { color: colors.muted }]}>Average cycle length used: {avgCycleLength ?? 28} days</Text>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardLabel}>Cycle Regularity Score</Text>
+        <View style={[styles.card, { backgroundColor: colors.card }]}>
+          <Text style={[styles.cardLabel, { color: colors.muted }]}>Cycle Regularity Score</Text>
           <Text style={[styles.cardValue, { color: scoreColor }]}>{score}/100</Text>
           <View style={styles.progressTrack}>
             <View style={[styles.progressFill, { width: `${score}%` as any, backgroundColor: scoreColor }]} />
           </View>
-          <Text style={styles.helperText}>Based on recent cycle-to-cycle variation.</Text>
+          <Text style={[styles.helperText, { color: colors.muted }]}>Based on recent cycle-to-cycle variation.</Text>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardLabel}>Recent Cycle Lengths</Text>
+        <View style={[styles.card, { backgroundColor: colors.card }]}>
+          <Text style={[styles.cardLabel, { color: colors.muted }]}>Recent Cycle Lengths</Text>
           {trendLengths.length > 0 ? (
             <View style={styles.trendWrap}>
               {trendLengths.map((days, index) => (
@@ -206,36 +243,36 @@ export default function HomeScreen() {
               ))}
             </View>
           ) : (
-            <Text style={styles.helperText}>Add more entries to view trend data.</Text>
+            <Text style={[styles.helperText, { color: colors.muted }]}>Add more entries to view trend data.</Text>
           )}
         </View>
 
-        <View style={[styles.card, styles.tipCard]}>
-          <Text style={styles.cardLabel}>Daily Support Tip</Text>
-          <Text style={styles.tipText}>{dailyTip}</Text>
+        <View style={[styles.card, styles.tipCard, { backgroundColor: colors.card, borderLeftColor: colors.secondary }]}>
+          <Text style={[styles.cardLabel, { color: colors.muted }]}>Daily Support Tip</Text>
+          <Text style={[styles.tipText, { color: colors.text }]}>{dailyTip}</Text>
         </View>
 
         {partnerPreferences.length > 0 && (
-          <View style={[styles.card, styles.prefCard]}>
-            <Text style={styles.cardLabel}>
+          <View style={[styles.card, styles.prefCard, { backgroundColor: colors.card, borderLeftColor: colors.primary }]}>
+            <Text style={[styles.cardLabel, { color: colors.muted }]}>
               {partnerName ? `${partnerName}'s Comfort Checklist` : 'Partner Comfort Checklist'}
             </Text>
-            <Text style={styles.helperText}>Check if she needs any of these:</Text>
+            <Text style={[styles.helperText, { color: colors.muted }]}>Check if she needs any of these:</Text>
             {partnerPreferences.map((item) => (
               <View key={item} style={styles.prefRow}>
                 <Text style={styles.prefBullet}>•</Text>
-                <Text style={styles.prefItem}>{item}</Text>
+                <Text style={[styles.prefItem, { color: colors.text }]}>{item}</Text>
               </View>
             ))}
           </View>
         )}
 
         {showForm && (
-          <View style={styles.form}>
-            <Text style={styles.label}>Entry Type</Text>
+          <View style={[styles.form, { backgroundColor: colors.card }]}>
+            <Text style={[styles.label, { color: colors.text }]}>Entry Type</Text>
             <View style={styles.entryModeRow}>
               <TouchableOpacity
-                style={[styles.modeChip, entryMode === 'cycle' && styles.modeChipActive]}
+                style={[styles.modeChip, entryMode === 'cycle' && styles.modeChipActive, entryMode === 'cycle' && { backgroundColor: colors.primary, borderColor: colors.primary }]}
                 onPress={() => setEntryMode('cycle')}
               >
                 <Text style={[styles.modeChipText, entryMode === 'cycle' && styles.modeChipTextActive]}>
@@ -243,7 +280,7 @@ export default function HomeScreen() {
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modeChip, entryMode === 'daily' && styles.modeChipActive]}
+                style={[styles.modeChip, entryMode === 'daily' && styles.modeChipActive, entryMode === 'daily' && { backgroundColor: colors.primary, borderColor: colors.primary }]}
                 onPress={() => setEntryMode('daily')}
               >
                 <Text style={[styles.modeChipText, entryMode === 'daily' && styles.modeChipTextActive]}>
@@ -252,49 +289,52 @@ export default function HomeScreen() {
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.label}>
+            <Text style={[styles.label, { color: colors.text }]}> 
               {entryMode === 'cycle' ? 'Cycle Start Date (YYYY-MM-DD)' : 'Log Date (YYYY-MM-DD)'}
             </Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { borderColor: borderSoft, color: colors.text, backgroundColor: colors.background }]}
               value={selectedDate}
               onChangeText={setSelectedDate}
               placeholder="e.g. 2026-04-27"
+              placeholderTextColor={colors.muted}
               maxLength={10}
             />
 
             {entryMode === 'cycle' && (
               <>
-                <Text style={styles.label}>Cycle End Date (optional)</Text>
+                <Text style={[styles.label, { color: colors.text }]}>Cycle End Date (optional)</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { borderColor: borderSoft, color: colors.text, backgroundColor: colors.background }]}
                   value={selectedEndDate}
                   onChangeText={setSelectedEndDate}
                   placeholder="e.g. 2026-05-01"
+                  placeholderTextColor={colors.muted}
                   maxLength={10}
                 />
               </>
             )}
 
-            <Text style={styles.label}>Mood</Text>
+            <Text style={[styles.label, { color: colors.text }]}>Mood</Text>
             <TextInput
-              style={styles.symptomSearch}
+              style={[styles.symptomSearch, { borderColor: borderSoft, color: colors.text, backgroundColor: colors.background }]}
               value={moodSearch}
               onChangeText={setMoodSearch}
               placeholder="Search moods..."
+              placeholderTextColor={colors.muted}
               clearButtonMode="while-editing"
             />
-            <ScrollView style={styles.symptomScroll} contentContainerStyle={styles.chipRow} nestedScrollEnabled>
+            <ScrollView style={[styles.symptomScroll, { borderColor: borderSoft, backgroundColor: colors.background }]} contentContainerStyle={styles.chipRow} nestedScrollEnabled>
               {filteredMoods.length === 0 ? (
-                <Text style={styles.noResults}>No matching moods</Text>
+                <Text style={[styles.noResults, { color: colors.muted }]}>No matching moods</Text>
               ) : (
                 filteredMoods.map((mood) => (
                   <TouchableOpacity
                     key={mood}
-                    style={[styles.chip, selectedMoods.includes(mood) && styles.chipSelected]}
+                    style={[styles.chip, { borderColor: borderSoft }, selectedMoods.includes(mood) && styles.chipSelected]}
                     onPress={() => toggleMood(mood)}
                   >
-                    <Text style={[styles.chipText, selectedMoods.includes(mood) && styles.chipTextSelected]}>
+                    <Text style={[styles.chipText, { color: colors.text }, selectedMoods.includes(mood) && styles.chipTextSelected]}>
                       {mood}
                     </Text>
                   </TouchableOpacity>
@@ -302,30 +342,31 @@ export default function HomeScreen() {
               )}
             </ScrollView>
             {selectedMoods.length > 0 ? (
-              <Text style={styles.selectedCount}>{selectedMoods.length} selected: {selectedMoods.join(', ')}</Text>
+              <Text style={[styles.selectedCount, { color: colors.primary }]}>{selectedMoods.length} selected: {selectedMoods.join(', ')}</Text>
             ) : (
-              <Text style={styles.selectedCount}>No moods selected</Text>
+              <Text style={[styles.selectedCount, { color: colors.muted }]}>No moods selected</Text>
             )}
 
-            <Text style={styles.label}>Symptoms</Text>
+            <Text style={[styles.label, { color: colors.text }]}>Symptoms</Text>
             <TextInput
-              style={styles.symptomSearch}
+              style={[styles.symptomSearch, { borderColor: borderSoft, color: colors.text, backgroundColor: colors.background }]}
               value={symptomSearch}
               onChangeText={setSymptomSearch}
               placeholder="Search symptoms..."
+              placeholderTextColor={colors.muted}
               clearButtonMode="while-editing"
             />
-            <ScrollView style={styles.symptomScroll} contentContainerStyle={styles.chipRow} nestedScrollEnabled>
+            <ScrollView style={[styles.symptomScroll, { borderColor: borderSoft, backgroundColor: colors.background }]} contentContainerStyle={styles.chipRow} nestedScrollEnabled>
               {filteredSymptoms.length === 0 ? (
-                <Text style={styles.noResults}>No matching symptoms</Text>
+                <Text style={[styles.noResults, { color: colors.muted }]}>No matching symptoms</Text>
               ) : (
                 filteredSymptoms.map((symptom) => (
                   <TouchableOpacity
                     key={symptom}
-                    style={[styles.chip, selectedSymptoms.includes(symptom) && styles.chipSelected]}
+                    style={[styles.chip, { borderColor: borderSoft }, selectedSymptoms.includes(symptom) && styles.chipSelected]}
                     onPress={() => toggleSymptom(symptom)}
                   >
-                    <Text style={[styles.chipText, selectedSymptoms.includes(symptom) && styles.chipTextSelected]}>
+                    <Text style={[styles.chipText, { color: colors.text }, selectedSymptoms.includes(symptom) && styles.chipTextSelected]}>
                       {symptom}
                     </Text>
                   </TouchableOpacity>
@@ -333,20 +374,21 @@ export default function HomeScreen() {
               )}
             </ScrollView>
             {selectedSymptoms.length > 0 && (
-              <Text style={styles.selectedCount}>{selectedSymptoms.length} selected: {selectedSymptoms.join(', ')}</Text>
+              <Text style={[styles.selectedCount, { color: colors.primary }]}>{selectedSymptoms.length} selected: {selectedSymptoms.join(', ')}</Text>
             )}
 
-            <Text style={styles.label}>Notes</Text>
+            <Text style={[styles.label, { color: colors.text }]}>Notes</Text>
             <TextInput
-              style={[styles.input, styles.notesInput]}
+              style={[styles.input, styles.notesInput, { borderColor: borderSoft, color: colors.text, backgroundColor: colors.background }]}
               value={notes}
               onChangeText={setNotes}
               placeholder="Optional notes..."
+              placeholderTextColor={colors.muted}
               multiline
               maxLength={500}
             />
 
-            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+            <TouchableOpacity style={[styles.saveButton, { backgroundColor: colors.primary }]} onPress={handleSave}>
               <Text style={styles.saveButtonText}>
                 {entryMode === 'cycle' ? 'Save Cycle Entry' : 'Save Daily Log'}
               </Text>
@@ -358,9 +400,9 @@ export default function HomeScreen() {
       </ScrollView>
 
       {/* Sticky log button */}
-      <View style={styles.stickyFooter}>
+      <View style={[styles.stickyFooter, { backgroundColor: colors.background, borderTopColor: borderSoft }]}> 
         <View style={[styles.stickyInner, isWide && styles.stickyInnerWide]}>
-          <TouchableOpacity style={styles.logButton} onPress={() => setShowForm(!showForm)}>
+          <TouchableOpacity style={[styles.logButton, { backgroundColor: colors.primary }]} onPress={() => setShowForm(!showForm)}>
             <Text style={styles.logButtonText}>{showForm ? 'Cancel' : '+ Log Entry'}</Text>
           </TouchableOpacity>
         </View>
@@ -374,7 +416,22 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   content: { padding: 20, paddingBottom: 16 },
   contentWide: { maxWidth: 560, width: '100%', alignSelf: 'center' },
-  title: { fontSize: 28, fontWeight: '700', color: '#00695C', marginBottom: 6, textAlign: 'center' },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  headerSpacer: { width: 58 },
+  title: { flex: 1, fontSize: 28, fontWeight: '700', color: '#00695C', textAlign: 'center' },
+  headerDarkModeControl: {
+    width: 58,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: 4,
+  },
+  darkModeIcon: { fontSize: 16 },
+  darkModeSwitch: { transform: [{ scale: 0.85 }] },
   subtitle: { marginBottom: 14, textAlign: 'center', color: '#7b6c74', fontSize: 14 },
 
   // Phase banner
