@@ -419,7 +419,7 @@ export default function CalendarScreen() {
             style={[styles.filterChip, historyFilter === 'all' && styles.filterChipActive, historyFilter === 'all' && { backgroundColor: colors.primary, borderColor: colors.primary }]}
             onPress={() => setHistoryFilter('all')}
           >
-            <Text style={[styles.filterChipText, historyFilter === 'all' && styles.filterChipTextActive]}>
+            <Text style={[styles.filterChipText, { color: colors.text }, historyFilter === 'all' && styles.filterChipTextActive]}>
               All ({totalCount})
             </Text>
           </TouchableOpacity>
@@ -427,7 +427,7 @@ export default function CalendarScreen() {
             style={[styles.filterChip, historyFilter === 'cycle' && styles.filterChipActive, historyFilter === 'cycle' && { backgroundColor: colors.primary, borderColor: colors.primary }]}
             onPress={() => setHistoryFilter('cycle')}
           >
-            <Text style={[styles.filterChipText, historyFilter === 'cycle' && styles.filterChipTextActive]}>
+            <Text style={[styles.filterChipText, { color: colors.text }, historyFilter === 'cycle' && styles.filterChipTextActive]}>
               Cycle ({cycleCount})
             </Text>
           </TouchableOpacity>
@@ -435,7 +435,7 @@ export default function CalendarScreen() {
             style={[styles.filterChip, historyFilter === 'daily' && styles.filterChipActive, historyFilter === 'daily' && { backgroundColor: colors.primary, borderColor: colors.primary }]}
             onPress={() => setHistoryFilter('daily')}
           >
-            <Text style={[styles.filterChipText, historyFilter === 'daily' && styles.filterChipTextActive]}>
+            <Text style={[styles.filterChipText, { color: colors.text }, historyFilter === 'daily' && styles.filterChipTextActive]}>
               Daily ({dailyCount})
             </Text>
           </TouchableOpacity>

@@ -13,7 +13,8 @@
       "backgroundColor": "#FFF5F8"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.nathanshabach.cycletracker"
     },
     "android": {
       "adaptiveIcon": {
@@ -21,10 +22,16 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.nathanshabach.cycletracker"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "5e172a2a-75f8-4786-865f-ef2c62d2087e"
+      }
     }
   }
 }

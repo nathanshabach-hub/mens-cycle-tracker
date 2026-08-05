@@ -3,6 +3,7 @@ import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView,
   TextInput, Alert, useWindowDimensions, Switch,
 } from 'react-native';
+import { Calendar } from 'react-native-calendars';
 import { format, parseISO } from 'date-fns';
 import {
   getCycleEntries,
@@ -59,6 +60,10 @@ export default function HomeScreen() {
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [symptomSearch, setSymptomSearch] = useState('');
   const [notes, setNotes] = useState('');
+  const [moodOpen, setMoodOpen] = useState(false);
+  const [symptomsOpen, setSymptomsOpen] = useState(false);
+  const [showStartCal, setShowStartCal] = useState(false);
+  const [showEndCal, setShowEndCal] = useState(false);
 
   const isDarkMode =
     colors.background.toUpperCase() === DARK_THEME_COLORS.background &&
@@ -275,7 +280,7 @@ export default function HomeScreen() {
                 style={[styles.modeChip, entryMode === 'cycle' && styles.modeChipActive, entryMode === 'cycle' && { backgroundColor: colors.primary, borderColor: colors.primary }]}
                 onPress={() => setEntryMode('cycle')}
               >
-                <Text style={[styles.modeChipText, entryMode === 'cycle' && styles.modeChipTextActive]}>
+                <Text style={[styles.modeChipText, entryMode === 'cycle' && styles.modeChipTextActive, { color: entryMode === 'cycle' ? '#fff' : colors.text }]}>
                   Cycle Start
                 </Text>
               </TouchableOpacity>
@@ -283,98 +288,156 @@ export default function HomeScreen() {
                 style={[styles.modeChip, entryMode === 'daily' && styles.modeChipActive, entryMode === 'daily' && { backgroundColor: colors.primary, borderColor: colors.primary }]}
                 onPress={() => setEntryMode('daily')}
               >
-                <Text style={[styles.modeChipText, entryMode === 'daily' && styles.modeChipTextActive]}>
+                <Text style={[styles.modeChipText, entryMode === 'daily' && styles.modeChipTextActive, { color: entryMode === 'daily' ? '#fff' : colors.text }]}>
                   Daily Log
                 </Text>
               </TouchableOpacity>
             </View>
 
-            <Text style={[styles.label, { color: colors.text }]}> 
-              {entryMode === 'cycle' ? 'Cycle Start Date (YYYY-MM-DD)' : 'Log Date (YYYY-MM-DD)'}
+            <Text style={[styles.label, { color: colors.text }]}>
+              {entryMode === 'cycle' ? 'Cycle Start Date' : 'Log Date'}
             </Text>
-            <TextInput
-              style={[styles.input, { borderColor: borderSoft, color: colors.text, backgroundColor: colors.background }]}
-              value={selectedDate}
-              onChangeText={setSelectedDate}
-              placeholder="e.g. 2026-04-27"
-              placeholderTextColor={colors.muted}
-              maxLength={10}
-            />
+            <TouchableOpacity
+              style={[styles.datePickerButton, { borderColor: borderSoft, backgroundColor: colors.background }]}
+              onPress={() => { setShowStartCal((v) => !v); setShowEndCal(false); }}
+            >
+              <Text style={{ color: selectedDate ? colors.text : colors.muted, fontSize: 15 }}>
+                {selectedDate ? format(parseISO(selectedDate), 'dd/MM/yy') : 'Select date'}
+              </Text>
+              <Text style={{ color: colors.muted, fontSize: 13 }}>{showStartCal ? '▲' : '▼'}</Text>
+            </TouchableOpacity>
+            {showStartCal && (
+              <Calendar
+                current={selectedDate || format(new Date(), 'yyyy-MM-dd')}
+                onDayPress={(day) => { setSelectedDate(day.dateString); setShowStartCal(false); }}
+                markedDates={selectedDate ? { [selectedDate]: { selected: true, selectedColor: colors.primary } } : {}}
+                theme={{
+                  calendarBackground: colors.card,
+                  monthTextColor: colors.text,
+                  dayTextColor: colors.text,
+                  textDisabledColor: colors.muted,
+                  textSectionTitleColor: colors.muted,
+                  selectedDayBackgroundColor: colors.primary,
+                  selectedDayTextColor: colors.card,
+                  todayTextColor: colors.primary,
+                  arrowColor: colors.primary,
+                }}
+                style={[styles.inlineCalendar, { borderColor: borderSoft, backgroundColor: colors.card }]}
+              />
+            )}
 
             {entryMode === 'cycle' && (
               <>
                 <Text style={[styles.label, { color: colors.text }]}>Cycle End Date (optional)</Text>
-                <TextInput
-                  style={[styles.input, { borderColor: borderSoft, color: colors.text, backgroundColor: colors.background }]}
-                  value={selectedEndDate}
-                  onChangeText={setSelectedEndDate}
-                  placeholder="e.g. 2026-05-01"
-                  placeholderTextColor={colors.muted}
-                  maxLength={10}
-                />
+                <TouchableOpacity
+                  style={[styles.datePickerButton, { borderColor: borderSoft, backgroundColor: colors.background }]}
+                  onPress={() => { setShowEndCal((v) => !v); setShowStartCal(false); }}
+                >
+                  <Text style={{ color: selectedEndDate ? colors.text : colors.muted, fontSize: 15 }}>
+                    {selectedEndDate ? format(parseISO(selectedEndDate), 'dd/MM/yy') : 'Select end date (optional)'}
+                  </Text>
+                  <Text style={{ color: colors.muted, fontSize: 13 }}>{showEndCal ? '▲' : '▼'}</Text>
+                </TouchableOpacity>
+                {showEndCal && (
+                  <Calendar
+                    current={selectedEndDate || selectedDate || format(new Date(), 'yyyy-MM-dd')}
+                    onDayPress={(day) => { setSelectedEndDate(day.dateString); setShowEndCal(false); }}
+                    markedDates={selectedEndDate ? { [selectedEndDate]: { selected: true, selectedColor: colors.primary } } : {}}
+                    theme={{
+                      calendarBackground: colors.card,
+                      monthTextColor: colors.text,
+                      dayTextColor: colors.text,
+                      textDisabledColor: colors.muted,
+                      textSectionTitleColor: colors.muted,
+                      selectedDayBackgroundColor: colors.primary,
+                      selectedDayTextColor: colors.card,
+                      todayTextColor: colors.primary,
+                      arrowColor: colors.primary,
+                    }}
+                    style={[styles.inlineCalendar, { borderColor: borderSoft, backgroundColor: colors.card }]}
+                  />
+                )}
               </>
             )}
 
-            <Text style={[styles.label, { color: colors.text }]}>Mood</Text>
-            <TextInput
-              style={[styles.symptomSearch, { borderColor: borderSoft, color: colors.text, backgroundColor: colors.background }]}
-              value={moodSearch}
-              onChangeText={setMoodSearch}
-              placeholder="Search moods..."
-              placeholderTextColor={colors.muted}
-              clearButtonMode="while-editing"
-            />
-            <ScrollView style={[styles.symptomScroll, { borderColor: borderSoft, backgroundColor: colors.background }]} contentContainerStyle={styles.chipRow} nestedScrollEnabled>
-              {filteredMoods.length === 0 ? (
-                <Text style={[styles.noResults, { color: colors.muted }]}>No matching moods</Text>
-              ) : (
-                filteredMoods.map((mood) => (
-                  <TouchableOpacity
-                    key={mood}
-                    style={[styles.chip, { borderColor: borderSoft }, selectedMoods.includes(mood) && styles.chipSelected]}
-                    onPress={() => toggleMood(mood)}
-                  >
-                    <Text style={[styles.chipText, { color: colors.text }, selectedMoods.includes(mood) && styles.chipTextSelected]}>
-                      {mood}
-                    </Text>
-                  </TouchableOpacity>
-                ))
-              )}
-            </ScrollView>
-            {selectedMoods.length > 0 ? (
-              <Text style={[styles.selectedCount, { color: colors.primary }]}>{selectedMoods.length} selected: {selectedMoods.join(', ')}</Text>
-            ) : (
-              <Text style={[styles.selectedCount, { color: colors.muted }]}>No moods selected</Text>
+            <TouchableOpacity style={[styles.accordionHeader, { borderColor: borderSoft }]} onPress={() => setMoodOpen((o) => !o)}>
+              <Text style={[styles.label, { color: colors.text, marginTop: 0, marginBottom: 0 }]}>Mood</Text>
+              <Text style={[styles.accordionMeta, { color: colors.muted }]}>
+                {selectedMoods.length > 0 ? `${selectedMoods.length} selected` : 'None'} {moodOpen ? '▲' : '▼'}
+              </Text>
+            </TouchableOpacity>
+            {moodOpen && (
+              <>
+                <TextInput
+                  style={[styles.symptomSearch, { borderColor: borderSoft, color: colors.text, backgroundColor: colors.background }]}
+                  value={moodSearch}
+                  onChangeText={setMoodSearch}
+                  placeholder="Search moods..."
+                  placeholderTextColor={colors.muted}
+                  clearButtonMode="while-editing"
+                />
+                <ScrollView style={[styles.symptomScroll, { borderColor: borderSoft, backgroundColor: colors.background }]} contentContainerStyle={styles.chipRow} nestedScrollEnabled>
+                  {filteredMoods.length === 0 ? (
+                    <Text style={[styles.noResults, { color: colors.muted }]}>No matching moods</Text>
+                  ) : (
+                    filteredMoods.map((mood) => (
+                      <TouchableOpacity
+                        key={mood}
+                        style={[styles.chip, { borderColor: borderSoft }, selectedMoods.includes(mood) && styles.chipSelected]}
+                        onPress={() => toggleMood(mood)}
+                      >
+                        <Text style={[styles.chipText, { color: colors.text }, selectedMoods.includes(mood) && styles.chipTextSelected]}>
+                          {mood}
+                        </Text>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
+                {selectedMoods.length > 0 ? (
+                  <Text style={[styles.selectedCount, { color: colors.primary }]}>{selectedMoods.length} selected: {selectedMoods.join(', ')}</Text>
+                ) : (
+                  <Text style={[styles.selectedCount, { color: colors.muted }]}>No moods selected</Text>
+                )}
+              </>
             )}
 
-            <Text style={[styles.label, { color: colors.text }]}>Symptoms</Text>
-            <TextInput
-              style={[styles.symptomSearch, { borderColor: borderSoft, color: colors.text, backgroundColor: colors.background }]}
-              value={symptomSearch}
-              onChangeText={setSymptomSearch}
-              placeholder="Search symptoms..."
-              placeholderTextColor={colors.muted}
-              clearButtonMode="while-editing"
-            />
-            <ScrollView style={[styles.symptomScroll, { borderColor: borderSoft, backgroundColor: colors.background }]} contentContainerStyle={styles.chipRow} nestedScrollEnabled>
-              {filteredSymptoms.length === 0 ? (
-                <Text style={[styles.noResults, { color: colors.muted }]}>No matching symptoms</Text>
-              ) : (
-                filteredSymptoms.map((symptom) => (
-                  <TouchableOpacity
-                    key={symptom}
-                    style={[styles.chip, { borderColor: borderSoft }, selectedSymptoms.includes(symptom) && styles.chipSelected]}
-                    onPress={() => toggleSymptom(symptom)}
-                  >
-                    <Text style={[styles.chipText, { color: colors.text }, selectedSymptoms.includes(symptom) && styles.chipTextSelected]}>
-                      {symptom}
-                    </Text>
-                  </TouchableOpacity>
-                ))
-              )}
-            </ScrollView>
-            {selectedSymptoms.length > 0 && (
-              <Text style={[styles.selectedCount, { color: colors.primary }]}>{selectedSymptoms.length} selected: {selectedSymptoms.join(', ')}</Text>
+            <TouchableOpacity style={[styles.accordionHeader, { borderColor: borderSoft }]} onPress={() => setSymptomsOpen((o) => !o)}>
+              <Text style={[styles.label, { color: colors.text, marginTop: 0, marginBottom: 0 }]}>Symptoms</Text>
+              <Text style={[styles.accordionMeta, { color: colors.muted }]}>
+                {selectedSymptoms.length > 0 ? `${selectedSymptoms.length} selected` : 'None'} {symptomsOpen ? '▲' : '▼'}
+              </Text>
+            </TouchableOpacity>
+            {symptomsOpen && (
+              <>
+                <TextInput
+                  style={[styles.symptomSearch, { borderColor: borderSoft, color: colors.text, backgroundColor: colors.background }]}
+                  value={symptomSearch}
+                  onChangeText={setSymptomSearch}
+                  placeholder="Search symptoms..."
+                  placeholderTextColor={colors.muted}
+                  clearButtonMode="while-editing"
+                />
+                <ScrollView style={[styles.symptomScroll, { borderColor: borderSoft, backgroundColor: colors.background }]} contentContainerStyle={styles.chipRow} nestedScrollEnabled>
+                  {filteredSymptoms.length === 0 ? (
+                    <Text style={[styles.noResults, { color: colors.muted }]}>No matching symptoms</Text>
+                  ) : (
+                    filteredSymptoms.map((symptom) => (
+                      <TouchableOpacity
+                        key={symptom}
+                        style={[styles.chip, { borderColor: borderSoft }, selectedSymptoms.includes(symptom) && styles.chipSelected]}
+                        onPress={() => toggleSymptom(symptom)}
+                      >
+                        <Text style={[styles.chipText, { color: colors.text }, selectedSymptoms.includes(symptom) && styles.chipTextSelected]}>
+                          {symptom}
+                        </Text>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
+                {selectedSymptoms.length > 0 && (
+                  <Text style={[styles.selectedCount, { color: colors.primary }]}>{selectedSymptoms.length} selected: {selectedSymptoms.join(', ')}</Text>
+                )}
+              </>
             )}
 
             <Text style={[styles.label, { color: colors.text }]}>Notes</Text>
@@ -500,6 +563,18 @@ const styles = StyleSheet.create({
     padding: 10, fontSize: 15, color: '#333',
   },
   notesInput: { height: 80, textAlignVertical: 'top' },
+  datePickerButton: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    borderWidth: 1, borderRadius: 8, padding: 10, marginBottom: 4,
+  },
+  inlineCalendar: {
+    borderWidth: 1, borderRadius: 10, marginBottom: 8, overflow: 'hidden',
+  },
+  accordionHeader: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingVertical: 10, borderBottomWidth: 1, marginTop: 12, marginBottom: 6,
+  },
+  accordionMeta: { fontSize: 12 },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, padding: 8 },
   symptomSearch: {
     borderWidth: 1, borderColor: '#ddd', borderRadius: 8,
