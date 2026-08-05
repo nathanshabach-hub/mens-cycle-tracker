@@ -6,12 +6,7 @@ A mobile-first React Native / Expo app designed to help partners track, understa
 
 ## Screenshots
 
-> Screenshots captured on iPhone 15 Pro Max (dark & light mode)
-
-| Home | History | Insights | Settings |
-|------|---------|----------|----------|
-| ![Home Screen](assets/screenshots/home-light.png) | ![History Screen](assets/screenshots/history-light.png) | ![Insights Screen](assets/screenshots/insights-light.png) | ![Settings Screen](assets/screenshots/settings-light.png) |
-| ![Home Dark](assets/screenshots/home-dark.png) | ![History Dark](assets/screenshots/history-dark.png) | ![Insights Dark](assets/screenshots/insights-dark.png) | ![Settings Dark](assets/screenshots/settings-dark.png) |
+> Screenshots coming soon.
 
 ---
 
