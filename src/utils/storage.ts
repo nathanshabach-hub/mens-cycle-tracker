@@ -242,25 +242,36 @@ export function getDailySupportTip(
   return 'Stable phase: focus on healthy routines, sleep, and supportive check-ins.';
 }
 
-export function getMarkedDates(entries: CycleEntry[]): Record<string, { marked: boolean; dotColor: string; selected?: boolean; selectedColor?: string }> {
-  const marked: Record<string, { marked: boolean; dotColor: string; selected?: boolean; selectedColor?: string }> = {};
+export function getMarkedDates(
+  entries: CycleEntry[],
+  avgPeriodLength = 5,
+): Record<string, { marked: boolean; dotColor: string; selected?: boolean; selectedColor?: string; predicted?: boolean }> {
+  const marked: Record<string, { marked: boolean; dotColor: string; selected?: boolean; selectedColor?: string; predicted?: boolean }> = {};
   entries.forEach((entry) => {
-    if (!entry.endDate) {
-      marked[entry.startDate] = { marked: true, dotColor: '#E91E63' };
-      return;
-    }
+    const confirmedEnd = entry.endDate ? parseISO(entry.endDate) : parseISO(entry.startDate);
+    const predictedEnd = addDays(parseISO(entry.startDate), avgPeriodLength - 1);
 
+    // Mark confirmed days (startDate → endDate)
     try {
       let cursor = parseISO(entry.startDate);
-      const end = parseISO(entry.endDate);
-      while (cursor <= end) {
+      while (cursor <= confirmedEnd) {
         const key = format(cursor, 'yyyy-MM-dd');
         marked[key] = { marked: true, dotColor: '#E91E63' };
         cursor = addDays(cursor, 1);
       }
-    } catch {
-      marked[entry.startDate] = { marked: true, dotColor: '#E91E63' };
-    }
+    } catch { /* skip invalid */ }
+
+    // Mark predicted remaining days (endDate+1 → predictedEnd) as faded
+    try {
+      let cursor = addDays(confirmedEnd, 1);
+      while (cursor <= predictedEnd) {
+        const key = format(cursor, 'yyyy-MM-dd');
+        if (!marked[key]) {
+          marked[key] = { marked: true, dotColor: '#E91E6355', predicted: true };
+        }
+        cursor = addDays(cursor, 1);
+      }
+    } catch { /* skip invalid */ }
   });
   return marked;
 }

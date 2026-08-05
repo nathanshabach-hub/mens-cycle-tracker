@@ -4,7 +4,7 @@ import {
   TextInput, Alert, useWindowDimensions, Switch,
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, addDays } from 'date-fns';
 import {
   getCycleEntries,
   DEFAULT_APP_COLORS,
@@ -50,11 +50,22 @@ export default function HomeScreen() {
   const [partnerName, setPartnerName] = useState('');
   const [trendLengths, setTrendLengths] = useState<number[]>([]);
   const [partnerPreferences, setPartnerPreferences] = useState<string[]>([]);
+  const [avgPeriodLength, setAvgPeriodLength] = useState(5);
   const [currentPhase, setCurrentPhase] = useState<CyclePhase | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [entryMode, setEntryMode] = useState<'cycle' | 'daily'>('cycle');
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [selectedEndDate, setSelectedEndDate] = useState('');
+
+  // Auto-populate end date when start date changes in cycle mode
+  const handleStartDateChange = useCallback((date: string) => {
+    setSelectedDate(date);
+    if (entryMode === 'cycle' && avgPeriodLength > 1) {
+      try {
+        setSelectedEndDate(format(addDays(parseISO(date), avgPeriodLength - 1), 'yyyy-MM-dd'));
+      } catch { /* invalid date mid-typing */ }
+    }
+  }, [entryMode, avgPeriodLength]);
   const [selectedMoods, setSelectedMoods] = useState<MoodOption[]>(['Neutral']);
   const [moodSearch, setMoodSearch] = useState('');
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
@@ -103,6 +114,7 @@ export default function HomeScreen() {
     setDailyTip(getDailySupportTip(today, forecast, profile));
     setPartnerName(profile.partnerName);
     setPartnerPreferences(profile.partnerPreferences ?? []);
+    setAvgPeriodLength(profile.averagePeriodLength ?? 5);
 
     const phases = getCyclePhases(forecast, lastStart);
     const phase = phases.find((p) => today >= p.start && today <= p.end) ?? null;
@@ -309,7 +321,7 @@ export default function HomeScreen() {
             {showStartCal && (
               <Calendar
                 current={selectedDate || format(new Date(), 'yyyy-MM-dd')}
-                onDayPress={(day) => { setSelectedDate(day.dateString); setShowStartCal(false); }}
+                onDayPress={(day) => { handleStartDateChange(day.dateString); setShowStartCal(false); }}
                 markedDates={selectedDate ? { [selectedDate]: { selected: true, selectedColor: colors.primary } } : {}}
                 theme={{
                   calendarBackground: colors.card,

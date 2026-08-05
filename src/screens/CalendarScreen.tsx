@@ -12,6 +12,7 @@ import {
   deleteDailyLogEntry,
   saveDailyLogEntry,
   predictFertilityWindow,
+  getPartnerProfile,
 } from '../utils/storage';
 import { CycleEntry, DailyLogEntry } from '../types';
 import { AppColors } from '../types';
@@ -26,6 +27,19 @@ const DARK_THEME_COLORS: AppColors = {
   muted: '#94A3B8',
 };
 
+function OutlinedDropIcon({ size = 10, color = '#E91E63' }: { size?: number; color?: string }) {
+  const r = size * 0.75;
+  return (
+    <View style={{
+      width: size, height: size,
+      borderWidth: 1.5, borderColor: color,
+      borderTopLeftRadius: r, borderTopRightRadius: r,
+      borderBottomLeftRadius: r, borderBottomRightRadius: 0,
+      transform: [{ rotate: '45deg' }],
+    }} />
+  );
+}
+
 function getEntryMoodText(entry: CycleEntry): string {
   if (entry.moods && entry.moods.length > 0) return entry.moods.join(', ');
   return entry.mood || 'Neutral';
@@ -36,7 +50,7 @@ function getDailyMoodText(entry: DailyLogEntry): string {
 }
 
 function isCycleMarkedDate(marking: any): boolean {
-  return Boolean(marking?.marked && marking?.dotColor === '#E91E63');
+  return Boolean(marking?.marked && (marking?.dotColor === '#E91E63' || marking?.predicted));
 }
 
 function formatReadableDate(dateStr: string): string {
@@ -80,6 +94,7 @@ export default function CalendarScreen() {
   const [editingNotes, setEditingNotes] = useState('');
   const [historyFilter, setHistoryFilter] = useState<'all' | 'cycle' | 'daily'>('all');
   const [markedDates, setMarkedDates] = useState<Record<string, any>>({});
+  const [avgPeriodLength, setAvgPeriodLength] = useState(5);
 
   const isDarkMode =
     colors.background.toUpperCase() === DARK_THEME_COLORS.background &&
@@ -88,9 +103,12 @@ export default function CalendarScreen() {
   const load = useCallback(async () => {
     const data = await getCycleEntries();
     const logs = await getDailyLogEntries();
+    const profile = await getPartnerProfile();
+    const periodLen = profile.averagePeriodLength ?? 5;
     setEntries(data);
     setDailyLogs(logs);
-    const marks = getMarkedDates(data);
+    setAvgPeriodLength(periodLen);
+    const marks = getMarkedDates(data, periodLen);
     logs.forEach((log) => {
       if (!marks[log.date]) {
         marks[log.date] = {
@@ -103,12 +121,13 @@ export default function CalendarScreen() {
     });
     const forecast = predictFertilityWindow(data);
     if (forecast) {
-      marks[forecast.nextCycleStart] = {
-        marked: true,
-        dotColor: '#E65100',
-        selected: true,
-        selectedColor: '#FFB74D',
-      };
+      // Mark the predicted next period days as outlined drops instead of a single orange circle
+      let periodCursor = parseISO(forecast.nextCycleStart);
+      for (let i = 0; i < periodLen; i++) {
+        const key = format(periodCursor, 'yyyy-MM-dd');
+        marks[key] = { marked: true, dotColor: '#E91E6355', predicted: true };
+        periodCursor = addDays(periodCursor, 1);
+      }
 
       let cursor = parseISO(forecast.fertileWindowStart);
       const fertileEnd = parseISO(forecast.fertileWindowEnd);
@@ -331,6 +350,7 @@ export default function CalendarScreen() {
           if (!date) return <View style={styles.dayCell} />;
 
           const isCycleDay = isCycleMarkedDate(marking);
+          const isPredicted = Boolean((marking as any)?.predicted);
           const isSelected = Boolean(marking?.selected) && !isCycleDay;
           const dayTextColor = state === 'disabled'
             ? `${colors.muted}AA`
@@ -341,7 +361,11 @@ export default function CalendarScreen() {
               style={styles.dayCell}
               onPress={() => handleDayPress({ dateString: date.dateString })}
             >
-              {isCycleDay ? <Text style={styles.cycleDayIcon}>🩸</Text> : <View style={styles.cycleDayIconSpacer} />}
+              {isCycleDay ? (
+                isPredicted
+                  ? <View style={styles.cycleDayIconSpacer}><OutlinedDropIcon size={10} color="#E91E63" /></View>
+                  : <Text style={styles.cycleDayIcon}>🩸</Text>
+              ) : <View style={styles.cycleDayIconSpacer} />}
               <View
                 style={[
                   styles.dayNumberCircle,
@@ -363,12 +387,14 @@ export default function CalendarScreen() {
           <Text style={[styles.legendText, { color: colors.muted }]}>Cycle Days</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.dot, { backgroundColor: '#90CAF9' }]} />
-          <Text style={[styles.legendText, { color: colors.muted }]}>Daily Log</Text>
+          <View style={{ width: 16, alignItems: 'center', justifyContent: 'center' }}>
+            <OutlinedDropIcon size={10} color="#E91E63" />
+          </View>
+          <Text style={[styles.legendText, { color: colors.muted }]}>Predicted Days</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.dot, { backgroundColor: '#FFB74D' }]} />
-          <Text style={[styles.legendText, { color: colors.muted }]}>Predicted Next</Text>
+          <View style={[styles.dot, { backgroundColor: '#90CAF9' }]} />
+          <Text style={[styles.legendText, { color: colors.muted }]}>Daily Log</Text>
         </View>
         <View style={styles.legendItem}>
           <View style={[styles.dot, { backgroundColor: '#CE93D8' }]} />
