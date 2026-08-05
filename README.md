@@ -30,10 +30,10 @@ A mobile-first React Native / Expo app designed to help partners track, understa
 #### Log Entry Form
 | Cycle Entry | Daily Log |
 |-------------|-----------|
-| Start date | Date |
-| Optional end date | Multi-select moods |
-| Multi-select moods | Multi-select symptoms |
-| Multi-select symptoms | Free-text notes |
+| Start date (inline calendar picker, dd/MM/yy) | Date (inline calendar picker) |
+| End date auto-filled from avg period length | Multi-select moods (accordion) |
+| Multi-select moods (accordion) | Multi-select symptoms (accordion) |
+| Multi-select symptoms (accordion) | Free-text notes |
 | Free-text notes | Ovulation test result |
 | | Pregnancy test result |
 | | Intimacy / protection logged |
@@ -41,13 +41,16 @@ A mobile-first React Native / Expo app designed to help partners track, understa
 ---
 
 ### 📅 History — Cycle Calendar
-- **Interactive calendar** powered by `react-native-calendars` with month navigation arrows.
+- **Interactive calendar** powered by `react-native-calendars` with month navigation arrows (‹ ›).
 - **Colour-coded markers** on each day:
-  | Colour | Meaning |
+  | Marker | Meaning |
   |--------|---------|
-  | 🩸 Red drop | Cycle / bleeding day |
+  | 🩸 Filled drop | Confirmed cycle / bleeding day |
+  | ◇ Outlined drop | Predicted remaining period days (based on avg period length) |
   | Blue circle | Daily log entry |
-  | Orange circle | Predicted next cycle start |
+  | Purple circle | Fertile window |
+  | Teal circle | Ovulation day |
+  | Primary colour | Today |
   | Purple circle | Fertile window |
   | Teal circle | Ovulation day |
   | Primary colour | Today |
@@ -74,7 +77,7 @@ A mobile-first React Native / Expo app designed to help partners track, understa
   - Partner name
   - Trying to conceive toggle
   - Pregnancy mode toggle
-  - Average period length (days)
+  - Average period length (days) — used to auto-fill cycle end date and show predicted period days on the calendar
   - Partner preferences (multi-select from preset list)
 - **Colour theme**
   - One-tap preset palettes: **Teal** (default), **Sunset**, **Ocean**, **Forest**
@@ -85,7 +88,7 @@ A mobile-first React Native / Expo app designed to help partners track, understa
   - Set how many days before the predicted next cycle to send a reminder (slider, 1–7 days)
   - "Send test notification" button
 - **Support actions** — checkable list of support actions for the current/upcoming phase (e.g. "Hydration reminder", "Emotional support check-in").
-- **Dark mode** — toggle available on every screen (top-right moon icon).
+- **Dark mode** — toggle available on every screen (top-right moon icon). All chip text, labels and icons adapt to dark/light theme.
 - **About** — app version and description.
 
 ---
