@@ -45,6 +45,8 @@ function AppNavigator() {
           tabBarStyle: {
             backgroundColor: colors.card,
             borderTopColor: colors.muted,
+            paddingBottom: 12,
+            height: 64,
           },
           sceneStyle: { backgroundColor: colors.background },
           headerShown: false,

@@ -322,6 +322,11 @@ export default function CalendarScreen() {
         markedDates={markedDates}
         enableSwipeMonths
         theme={calendarTheme}
+        renderArrow={(direction) => (
+          <Text style={{ color: colors.primary, fontSize: 22, fontWeight: '600', paddingHorizontal: 8 }}>
+            {direction === 'left' ? '‹' : '›'}
+          </Text>
+        )}
         dayComponent={({ date, state, marking }) => {
           if (!date) return <View style={styles.dayCell} />;
 
