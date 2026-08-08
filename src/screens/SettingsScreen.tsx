@@ -195,6 +195,7 @@ export default function SettingsScreen() {
   const [nextCycle, setNextCycle] = useState<string | null>(null);
   const [partnerName, setPartnerName] = useState('');
   const [tryingToConceive, setTryingToConceive] = useState(false);
+  const [pregnancyMode, setPregnancyMode] = useState(false);
   const [averagePeriodLength, setAveragePeriodLength] = useState('5');
   const [todayActions, setTodayActions] = useState<string[]>([]);
   const [partnerPreferences, setPartnerPreferences] = useState<string[]>([]);
@@ -231,6 +232,7 @@ export default function SettingsScreen() {
     setNextCycle(forecast?.nextCycleStart ?? null);
     setPartnerName(profile.partnerName);
     setTryingToConceive(profile.tryingToConceive);
+    setPregnancyMode(profile.pregnancyMode ?? false);
     setAveragePeriodLength(String(profile.averagePeriodLength));
     setTodayActions(actions);
     setPartnerPreferences(profile.partnerPreferences ?? []);
@@ -362,10 +364,30 @@ export default function SettingsScreen() {
     await savePartnerProfile({
       partnerName: partnerName.trim(),
       tryingToConceive,
+      pregnancyMode,
       averagePeriodLength: periodLengthNum,
       partnerPreferences,
     });
     Alert.alert('Saved', 'Partner profile updated successfully.');
+  };
+
+  const handleTogglePregnancyMode = async (value: boolean) => {
+    const nextValue = value;
+    setPregnancyMode(nextValue);
+
+    const profile = await getPartnerProfile();
+    const parsedPeriodLength = Number(averagePeriodLength);
+    const safeAveragePeriodLength = Number.isFinite(parsedPeriodLength) && parsedPeriodLength > 0
+      ? parsedPeriodLength
+      : profile.averagePeriodLength ?? 5;
+
+    await savePartnerProfile({
+      partnerName: partnerName.trim(),
+      tryingToConceive,
+      pregnancyMode: nextValue,
+      averagePeriodLength: safeAveragePeriodLength,
+      partnerPreferences,
+    });
   };
 
   const handleAddPreference = async () => {
@@ -459,7 +481,14 @@ export default function SettingsScreen() {
                 trackColor={{ true: colors.primary }}
               />
             </View>
-
+            <View style={[styles.row, { borderTopColor: colors.muted + '33' }]}>
+              <Text style={[styles.rowLabel, { color: colors.text }]}>Pregnancy mode</Text>
+              <Switch
+                value={pregnancyMode}
+                onValueChange={handleTogglePregnancyMode}
+                trackColor={{ true: colors.primary }}
+              />
+            </View>
             <TouchableOpacity style={[styles.saveButton, { backgroundColor: colors.primary }]} onPress={handleSaveProfile}>
               <Text style={styles.saveButtonText}>Save Profile</Text>
             </TouchableOpacity>

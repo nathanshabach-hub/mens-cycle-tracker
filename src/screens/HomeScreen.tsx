@@ -48,6 +48,7 @@ export default function HomeScreen() {
   const [regularityScore, setRegularityScore] = useState<number | null>(null);
   const [dailyTip, setDailyTip] = useState('');
   const [partnerName, setPartnerName] = useState('');
+  const [pregnancyMode, setPregnancyMode] = useState(false);
   const [trendLengths, setTrendLengths] = useState<number[]>([]);
   const [partnerPreferences, setPartnerPreferences] = useState<string[]>([]);
   const [avgPeriodLength, setAvgPeriodLength] = useState(5);
@@ -113,6 +114,7 @@ export default function HomeScreen() {
     setTrendLengths(getRecentCycleLengths(data));
     setDailyTip(getDailySupportTip(today, forecast, profile));
     setPartnerName(profile.partnerName);
+    setPregnancyMode(profile.pregnancyMode ?? false);
     setPartnerPreferences(profile.partnerPreferences ?? []);
     setAvgPeriodLength(profile.averagePeriodLength ?? 5);
 
@@ -207,6 +209,11 @@ export default function HomeScreen() {
           </View>
         </View>
         {partnerName ? <Text style={[styles.subtitle, { color: colors.muted }]}>Tracking for {partnerName}</Text> : null}
+        {pregnancyMode && (
+          <View style={[styles.pregnancyBanner, { backgroundColor: colors.background, borderColor: colors.secondary }]}>
+            <Text style={[styles.pregnancyBannerText, { color: colors.text }]}>Pregnancy mode is active — support and comfort guidance is prioritized.</Text>
+          </View>
+        )}
 
         {/* Phase Banner */}
         {currentPhase && (
@@ -508,6 +515,14 @@ const styles = StyleSheet.create({
   darkModeIcon: { fontSize: 16 },
   darkModeSwitch: { transform: [{ scale: 0.85 }] },
   subtitle: { marginBottom: 14, textAlign: 'center', color: '#7b6c74', fontSize: 14 },
+  pregnancyBanner: {
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 12,
+  },
+  pregnancyBannerText: { fontSize: 13, lineHeight: 20 },
 
   // Phase banner
   phaseBanner: {

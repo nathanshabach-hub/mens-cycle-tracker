@@ -20,6 +20,7 @@ export const DEFAULT_PARTNER_PROFILE: PartnerProfile = {
   tryingToConceive: false,
   averagePeriodLength: 5,
   partnerPreferences: [],
+  pregnancyMode: false,
 };
 
 export const DEFAULT_APP_COLORS: AppColors = {
@@ -215,6 +216,10 @@ export function getDailySupportTip(
   forecast: FertilityForecast | null,
   profile: PartnerProfile
 ): string {
+  if (profile.pregnancyMode) {
+    return 'Pregnancy mode is on. Prioritize rest, hydration, comfort, and gentle reassurance.';
+  }
+
   if (!forecast) return 'Log at least two cycle start dates to unlock personalized guidance.';
 
   const today = parseISO(date);

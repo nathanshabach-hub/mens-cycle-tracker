@@ -36,6 +36,7 @@ export default function InsightsScreen() {
   const borderSoft = `${colors.muted}33`;
   const [monthlyInsights, setMonthlyInsights] = useState<MonthlyInsights[]>([]);
   const [phases, setPhases] = useState<CyclePhase[]>([]);
+  const [pregnancyMode, setPregnancyMode] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState<MonthlyInsights | null>(null);
 
   const isDarkMode =
@@ -51,6 +52,7 @@ export default function InsightsScreen() {
 
     const insights = getMonthlyInsights(entries);
     setMonthlyInsights(insights);
+    setPregnancyMode(profile.pregnancyMode ?? false);
     setPhases(getCyclePhases(forecast, lastCycleStart));
 
     if (insights.length > 0) {
@@ -83,6 +85,12 @@ export default function InsightsScreen() {
           />
         </View>
       </View>
+
+      {pregnancyMode && (
+        <View style={[styles.pregnancyBanner, { backgroundColor: colors.background, borderColor: colors.secondary }]}>
+          <Text style={[styles.pregnancyBannerText, { color: colors.text }]}>Pregnancy mode is on — support and comfort insights are shown instead of fertility planning.</Text>
+        </View>
+      )}
 
       {monthlyInsights.length === 0 ? (
         <View style={[styles.card, { backgroundColor: colors.card }]}>
@@ -205,6 +213,14 @@ const styles = StyleSheet.create({
   },
   sectionTitle: { fontSize: 16, fontWeight: '700', color: '#333', marginBottom: 12 },
   hint: { fontSize: 14, color: '#aaa', textAlign: 'center', lineHeight: 22 },
+  pregnancyBanner: {
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 16,
+  },
+  pregnancyBannerText: { fontSize: 13, lineHeight: 20 },
   monthScroll: { marginBottom: 12 },
   monthButton: {
     borderWidth: 2,

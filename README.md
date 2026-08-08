@@ -1,162 +1,144 @@
-# Cycle Tracker 🩸
+# Cycle Tracker
 
-A mobile-first React Native / Expo app designed to help partners track, understand, and support a loved one's menstrual cycle. Built with TypeScript, it runs on iOS, Android, and the web from a single codebase.
-
----
-
-## Screenshots
-
-> Screenshots coming soon.
-
----
+A mobile-first React Native and Expo app for tracking a partner's menstrual cycle, understanding cycle patterns, and keeping support needs visible. The same TypeScript codebase runs on Android, iOS, and the web.
 
 ## Features
 
-### 🏠 Home — Cycle Tracker
-- **Current phase indicator** — displays the active phase (Menstrual, Follicular, Fertile Window, Ovulation, Luteal) with an emoji, colour, and short description.
-- **Last cycle started** — shows the most recent cycle start date at a glance.
-- **Next predicted cycle** — forecasted start date based on average cycle length.
-- **Predicted ovulation day** — calculated 14 days before the next expected period, with the fertile window shown.
-- **Cycle regularity score** — 0–100 score with a progress bar based on cycle-to-cycle variation.
-- **Recent cycle lengths** — trend list of the last several cycle lengths.
-- **Daily support tip** — contextual tip based on the current phase (e.g. "Stable phase: focus on healthy routines, sleep, and supportive check-ins").
-- **+ Log Entry button** — opens a bottom-sheet form to log a new cycle or daily entry.
+### Home
 
-#### Log Entry Form
-| Cycle Entry | Daily Log |
+- Shows the current phase when today's date falls within the calculated cycle timeline.
+- Displays the latest cycle start, next predicted cycle, predicted ovulation date, fertile window, and average cycle length.
+- Calculates a cycle regularity score and charts up to six recent cycle lengths.
+- Provides a phase-aware daily support tip.
+- Shows the saved partner name and comfort preferences.
+- Supports cycle entries and daily logs through an inline form.
+
+| Cycle entry | Daily log |
 |-------------|-----------|
-| Start date (inline calendar picker, dd/MM/yy) | Date (inline calendar picker) |
-| End date auto-filled from avg period length | Multi-select moods (accordion) |
-| Multi-select moods (accordion) | Multi-select symptoms (accordion) |
-| Multi-select symptoms (accordion) | Free-text notes |
-| Free-text notes | Ovulation test result |
-| | Pregnancy test result |
-| | Intimacy / protection logged |
+| Start date | Date |
+| Optional end date, auto-filled from the profile period length | Multi-select moods |
+| Multi-select moods | Multi-select symptoms |
+| Multi-select symptoms | Notes |
+| Notes | |
 
----
+Daily-log types contain reserved fields for ovulation tests, pregnancy tests, intimacy, and protection, but these fields are not currently available in the logging form.
 
-### 📅 History — Cycle Calendar
-- **Interactive calendar** powered by `react-native-calendars` with month navigation arrows (‹ ›).
-- **Colour-coded markers** on each day:
-  | Marker | Meaning |
-  |--------|---------|
-  | 🩸 Filled drop | Confirmed cycle / bleeding day |
-  | ◇ Outlined drop | Predicted remaining period days (based on avg period length) |
-  | Blue circle | Daily log entry |
-  | Purple circle | Fertile window |
-  | Teal circle | Ovulation day |
-  | Primary colour | Today |
-  | Purple circle | Fertile window |
-  | Teal circle | Ovulation day |
-  | Primary colour | Today |
-- **Tap any highlighted date** to view full entry details in a detail card below the calendar.
-- **All Logged Entries list** — filterable by All / Cycle / Daily with entry counts shown on each filter chip.
-- **Inline delete** — swipeable delete button on every entry row.
-- **Edit daily log notes** — tap any date to open an editor modal for that day's notes.
+### Calendar and History
 
----
+- Uses `react-native-calendars` with arrow and swipe month navigation.
+- Marks confirmed and predicted period days, daily logs, the fertile window, ovulation, and today.
+- Opens a date editor from any calendar day to create or update a daily note.
+- Shows details for selected cycle and daily entries.
+- Lists all saved entries with All, Cycle, and Daily filters and entry counts.
+- Provides delete buttons with confirmation for cycle entries and daily logs.
 
-### 📊 Insights & Analytics
-- **Monthly breakdown** — per-month cards showing:
-  - Number of cycles logged
-  - Average cycle length
-  - Shortest and longest cycle
-  - Predicted phase for that month
-- **Phase timeline** — visual phase-by-phase breakdown (Menstrual → Follicular → Fertile Window → Ovulation → Luteal) with start/end dates for the current cycle.
-- **Partner profile context** — insights are personalised when a partner name and trying-to-conceive (TTC) mode are configured.
+| Marker | Meaning |
+|--------|---------|
+| Filled drop | Confirmed cycle or bleeding day |
+| Outlined drop | Predicted period day |
+| Blue circle | Daily log |
+| Purple circle | Fertile window |
+| Teal circle | Ovulation |
+| Theme primary colour | Today |
 
----
+### Insights
 
-### ⚙️ Settings
-- **Partner profile**
-  - Partner name
-  - Trying to conceive toggle
-  - Pregnancy mode toggle
-  - Average period length (days) — used to auto-fill cycle end date and show predicted period days on the calendar
-  - Partner preferences (multi-select from preset list)
-- **Colour theme**
-  - One-tap preset palettes: **Teal** (default), **Sunset**, **Ocean**, **Forest**
-  - Full custom colour editor — pick Primary, Secondary, Background, Card, Text, and Muted colours individually using an HSV colour picker with live hex input.
-  - Reset to defaults button
-- **Reminders & Notifications**
-  - Toggle push notifications on/off
-  - Set how many days before the predicted next cycle to send a reminder (slider, 1–7 days)
-  - "Send test notification" button
-- **Support actions** — checkable list of support actions for the current/upcoming phase (e.g. "Hydration reminder", "Emotional support check-in").
-- **Dark mode** — toggle available on every screen (top-right moon icon). All chip text, labels and icons adapt to dark/light theme.
-- **About** — app version and description.
+- Shows selectable recent months with the number of logged cycles and calculated shortest and longest cycle lengths.
+- Displays the Menstrual, Follicular, Fertile Window, Ovulation, and Luteal phase timeline with dates and descriptions.
+- Shows a pregnancy-mode status notice when that mode is enabled.
 
----
+### Settings
 
-## Cycle Phase Logic
+- **Partner profile:** name, average period length, trying-to-conceive status, and pregnancy mode.
+- **Partner preferences:** add and remove free-form comfort preferences.
+- **App colours:** Teal, Sunset, Ocean, and Forest presets plus HSV sliders, HEX inputs, and reset controls.
+- **Reminders:** separate toggles for 3 days and 1 day before the predicted next cycle.
+- **Today's support checklist:** hydration, rest, meals, pain-relief supplies, and emotional check-ins.
+- **Dark mode:** available from every screen and persisted with the selected app colours.
+- **About:** app purpose and local-data privacy summary.
 
-Phases are calculated from the last logged cycle start date and the fertility forecast:
+Notification controls require a cycle forecast. Enabling a reminder requests notification permission and scheduling is supported on physical devices.
 
-| Phase | Duration | Description |
-|-------|----------|-------------|
-| Menstrual | Days 1–5 | Rest & hydration phase |
-| Follicular | Days 6 – fertile window start | Energy & growth phase |
-| Fertile Window | 5 days before ovulation | High fertility window |
-| Ovulation | 14 days before next cycle | Peak fertility day |
-| Luteal | Ovulation + 1 → next cycle | Preparation phase |
+## Pregnancy Mode
 
-**Fertility forecast formula:**
-- `nextCycleStart = lastPeriodStart + averageCycleLength`
-- `ovulationDate = nextCycleStart − 14`
-- `fertileWindowStart = ovulationDate − 5`
-- `fertileWindowEnd = ovulationDate`
+Pregnancy mode is stored in the partner profile. Turning it on currently:
 
----
+- shows a status banner on Home and Insights;
+- replaces the Home daily tip with pregnancy-focused support guidance; and
+- preserves all existing cycle and daily-log data.
+
+Pregnancy mode currently changes status and guidance only. It does not disable cycle forecasts, fertile-window calculations, phase cards, reminders, or cycle logging.
+
+## Prediction Logic
+
+The app calculates average cycle length from valid intervals between saved cycle starts. It uses a 28-day default when there are fewer than two cycle starts.
+
+```text
+next cycle start  = latest cycle start + average cycle length
+ovulation         = next cycle start - 14 days
+fertile start     = ovulation - 5 days
+fertile end       = ovulation + 1 day
+```
+
+The displayed phase timeline uses these ranges:
+
+| Phase | Range |
+|-------|-------|
+| Menstrual | Latest cycle start through day 5 |
+| Follicular | Day 6 through the day before the fertile window |
+| Fertile Window | Five days before ovulation through one day after ovulation |
+| Ovulation | Predicted ovulation day |
+| Luteal | Day after ovulation through the day before the next predicted cycle |
+
+Predictions are estimates based on recorded cycle dates and are not medical advice.
 
 ## Tech Stack
 
-| Layer | Library / Tool |
-|-------|---------------|
-| Framework | [Expo](https://expo.dev) ~54 |
-| Language | TypeScript 5.9 |
-| UI | React Native 0.81 |
-| Navigation | React Navigation 7 (Bottom Tabs) |
-| Calendar | react-native-calendars 1.13 |
-| Date math | date-fns 4 |
-| Storage | AsyncStorage (@react-native-async-storage/async-storage) |
-| Notifications | expo-notifications |
-| Slider | @react-native-community/slider |
-| Web support | react-native-web |
-
----
+| Layer | Library |
+|-------|---------|
+| Framework | Expo 54 |
+| UI | React Native 0.81 and React 19 |
+| Language | TypeScript 5.9 in strict mode |
+| Navigation | React Navigation 7 bottom tabs |
+| Calendar | react-native-calendars 1.1314 |
+| Date calculations | date-fns 4 |
+| Local storage | AsyncStorage 2.2 |
+| Notifications | expo-notifications 0.32 |
+| Web | react-native-web 0.21 |
 
 ## Project Structure
 
-```
+```text
 mens-cycle-tracker/
-├── App.tsx                   # Root navigator & tab bar
-├── index.ts                  # Expo entry point
-├── app.json                  # Expo config
-├── assets/                   # Icons, splash screen
+├── App.tsx                       # Theme-aware bottom-tab navigator
+├── index.ts                      # Expo entry point
+├── app.json                      # Expo application configuration
+├── eas.json                      # EAS build profiles
+├── assets/                       # App icons and splash assets
 └── src/
     ├── screens/
-    │   ├── HomeScreen.tsx     # Dashboard & log entry form
-    │   ├── CalendarScreen.tsx # History calendar & entry list
-    │   ├── InsightsScreen.tsx # Monthly analytics & phase timeline
-    │   └── SettingsScreen.tsx # Profile, theme, notifications
+    │   ├── HomeScreen.tsx        # Dashboard and entry form
+    │   ├── CalendarScreen.tsx    # Calendar, notes, and history
+    │   ├── InsightsScreen.tsx    # Monthly and phase insights
+    │   └── SettingsScreen.tsx    # Profile, theme, reminders, and support
     ├── theme/
-    │   └── AppThemeContext.tsx # Global theme state & colour presets
+    │   └── AppThemeContext.tsx   # Persisted theme state and presets
     ├── types/
-    │   └── index.ts           # Shared types, mood/symptom constants
+    │   └── index.ts              # Shared models and option lists
     └── utils/
-        ├── calculations.ts    # Fertility forecast calculations
-        ├── insights.ts        # Phase & monthly insight builders
-        └── storage.ts         # AsyncStorage read/write helpers
+        ├── calculations.ts       # Standalone fertility calculation helper
+        ├── insights.ts           # Phase, monthly, and export-data helpers
+        └── storage.ts            # Persistence and forecast helpers
 ```
 
----
+Export formatting helpers exist in `src/utils/insights.ts`, but there is currently no export or share control in the app interface.
 
 ## Getting Started
 
 ### Prerequisites
-- [Node.js](https://nodejs.org) 18+
-- [Expo CLI](https://docs.expo.dev/get-started/installation/) or `npx`
-- iOS Simulator / Android Emulator **or** the [Expo Go](https://expo.dev/go) app on your phone
+
+- Node.js 20 LTS or newer
+- An Android emulator, iOS simulator, or physical device with Expo Go for native development
 
 ### Install
 
@@ -170,40 +152,27 @@ npm install
 
 | Target | Command |
 |--------|---------|
-| Expo DevTools (all platforms) | `npm start` |
-| iOS simulator | `npm run ios` |
-| Android emulator | `npm run android` |
+| Expo development server | `npm start` |
 | Web browser | `npm run web` |
+| Android emulator/device | `npm run android` |
+| iOS simulator | `npm run ios` |
+| Static web export | `npm run build:web` |
 
-Then open [http://localhost:8081](http://localhost:8081) for web, or scan the QR code with **Expo Go** on your phone.
+The default web development URL is [http://localhost:8081](http://localhost:8081). Expo may choose another port when that port is already occupied. For a physical device, scan the QR code printed by the development server.
 
-### Type-check
+### Validate
 
 ```bash
-npm test        # runs tsc --noEmit
 npm run typecheck
+npm test
 ```
 
----
+Both commands currently run TypeScript compilation with `tsc --noEmit`; the project does not yet include a separate unit-test suite.
 
-## Data Privacy
+## Data and Privacy
 
-All data is stored **locally on-device** using AsyncStorage. Nothing is transmitted to any server. No account or login is required.
-
----
-
-## Mood Options
-
-Positive: Happy, Energetic, Confident, Motivated, Calm  
-Neutral: Neutral  
-Negative (PMS/PMDD criteria): Irritable, Angry, Tense, Anxious, Overwhelmed, Sensitive, Sad, Tearful, Depressed, Withdrawn
-
-## Symptom Options
-
-Cramps, Bloating, Headache, Migraine, Fatigue, Low Energy, Back Pain, Pelvic Pain, Breast Tenderness, Breast Fullness, Nausea, Digestive Upset, Constipation, Diarrhea, Gas, Food Cravings, Increased/Reduced Appetite, Acne, Oily/Dry Skin, Water Retention, Sleep Changes, Insomnia, Anxiety, Irritability, Mood Swings, Low Mood, Stress, Brain Fog, Dizziness, Hot Flashes, Chills, Increased Discharge, Ovulation Pain, Spotting, Heavy/Light Flow
-
----
+Cycle entries, daily logs, partner-profile settings, support checklists, and theme colours are stored locally with AsyncStorage. No account or login is required. Enabling reminders uses the device notification APIs.
 
 ## License
 
-Private — all rights reserved.
+Private - all rights reserved.
